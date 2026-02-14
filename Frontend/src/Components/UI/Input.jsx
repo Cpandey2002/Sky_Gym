@@ -1,0 +1,46 @@
+import React from 'react';
+
+const Input = ({
+    label,
+    type = 'text',
+    placeholder,
+    value,
+    onChange,
+    error,
+    required = false,
+    className = '',
+    ...props
+}) => {
+    const inputClasses = `
+   pl-10 w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-500
+    focus:outline-none focus:ring-1 focus:ring-[#C2FC85] focus:border-[#C2FC85]
+    ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}
+    ${className}
+  `;
+
+    return (
+        <div className="space-y-1">
+            {label && (
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {label}
+                    {required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+            )}
+            <input
+                type={type}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                onWheel={(e) => e.target.blur()}
+                className={inputClasses}
+                {...props}
+
+            />
+            {error && (
+                <p className="text-xs text-red-600">{error}</p>
+            )}
+        </div>
+    );
+};
+
+export default Input;

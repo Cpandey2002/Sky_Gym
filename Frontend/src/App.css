@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Optional Premium Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #ec4899, #ef4444);
+  border-radius: 12px;
+}
+
+/* Smooth left-slide animation for sidebar */
+.sidebar-slide {
+  transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+
+
+/* ================= COMMON PRINT SETTINGS ================= */
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  body.print-mode * {
+    visibility: hidden;
+  }
+
+  body.print-mode #print-area-single,
+  body.print-mode #print-area-single *,
+  body.print-mode #print-area-multiple,
+  body.print-mode #print-area-multiple * {
+    visibility: visible;
+  }
+
+}
+
+
+/* ================= SINGLE I-CARD PRINT ================= */
+
+@media print {
+
+  #print-area-single {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+
+  }
+
+  #print-area-single .print-card,
+  #print-area-single > div {
+    width: 55mm !important;
+    height: 85mm !important;
+  }
+
+}
+
+
+
+/* ================= MULTIPLE I-CARD PRINT ================= */
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 5mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body.print-mode * {
+    visibility: hidden;
+  }
+
+  body.print-mode #print-area-multiple,
+  body.print-mode #print-area-multiple * {
+    visibility: visible;
+  }
+
+  #print-area-multiple {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: grid !important;
+
+    /* 55mm × 85mm card size */
+    grid-template-columns: repeat(4, 55mm);
+
+    grid-template-rows: repeat(2, 85mm);
+
+    gap: 10px;
+
+    justify-content: center;
+
+  }
+
+  .print-card {
+
+    width: 55mm !important;
+    height: 85mm !important;
+
+  }
+
+}
+@media print {
+
+  #print-area-single {
+
+    display: flex !important;
+    justify-content: center;
+    gap: 10mm;
+
+  }
+
+  #print-area-single > div {
+
+    width: 55mm !important;
+    height: 85mm !important;
+
+  }
+
+}
+
+#print-area-single{
+  display: flex;
+    gap: 10px;
+        justify-content: center;
+}
+/* Hide on screen */
+/* #print-area-multiple {
+  display: none;
+} */
+
+/* Show only when printing */
+@media print {
+
+  body.print-mode #print-area-multiple {
+    display: grid !important;
+  }
+
+}
+
+#print-area-single{
+  display: flex;
+    gap: 10px;
+}
+/* Hide on screen */
+#print-area-multiple {
+  display: none;
+}
+
+/* Show only when printing */
+@media print {
+
+  body.print-mode #print-area-multiple {
+    display: grid !important;
+  }
+
+}
