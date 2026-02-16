@@ -59,8 +59,10 @@ export default function Registration() {
         if (enquiry) {
 
             const generatedId = generateMemberId(
-                enquiry.client_name || "",
-            );
+    enquiry.client_name || "",
+    enquiry.mobile || ""
+);
+
 
             setFormData((prev) => ({
                 ...prev,

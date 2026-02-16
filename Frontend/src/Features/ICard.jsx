@@ -726,8 +726,6 @@ export default function Icard() {
                                     className="h-14 mx-auto"
                                 />
 
-
-
                                 {/* </div> */}
 
                                 <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white absolute top-18 left-1/2 -translate-x-1/2">
@@ -747,7 +745,7 @@ export default function Icard() {
                                     </h2>
                                 </div>
 
-                                <div className="mt-4 bg-white p-1 rounded">
+                                <div className="mt-2 bg-white p-1 rounded">
                                     <QRCodeCanvas value={client.member_id} size={90} />
                                 </div>
 
