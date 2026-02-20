@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import Topbar from "../Components/Topbar";
 import { getAllClients } from "../API/Client";
-import { getAllsession } from "../API/session";
+import { getAttendance } from "../API/Attendance";
 import { CheckCircle, XCircle, CalendarDays, Award, Timer, ChevronDown } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -29,51 +29,71 @@ export default function AttendanceReport() {
     useEffect(() => {
         loadData();
     }, [month, year]);
+const loadData = async () => {
 
-    const loadData = async () => {
-        setLoading(true);
-        try {
-            const clientRes = await getAllClients();
-            const sessionRes = await getAllsession();
+    setLoading(true);
 
-            const sessionList = sessionRes || [];
+    try {
 
+        const clientRes = await getAllClients();
 
-            setClients(clientRes);
-            setSessions(sessionList);
-            setLoading(false);
+        // ✅ correct API call
+        const attendanceRes = await getAttendance();
 
-            generateAttendanceMap(clientRes, sessionList);
-        } catch (error) {
-            console.log("Error loading data:", error);
-        }
-    };
+        const attendanceList = attendanceRes || [];
+
+        setClients(clientRes);
+
+        setSessions(attendanceList);
+
+        generateAttendanceMap(clientRes, attendanceList);
+
+    }
+    catch (error) {
+
+        console.log("Error loading data:", error);
+
+    }
+    finally {
+
+        setLoading(false);
+
+    }
+
+};
 
     // -----------------------------------------
     // Convert all sessions → { client_id: { day: "P" } }
     // -----------------------------------------
-    const generateAttendanceMap = (clientList, sessionList) => {
-        const map = {};
+const generateAttendanceMap = (clientList, attendanceList) => {
 
-        clientList.forEach((client) => {
-            map[client.id] = {};
+    const map = {};
 
-            sessionList.forEach((session) => {
-                const sessionDate = new Date(session.session_date);
-                const sessionMonth = sessionDate.getMonth() + 1;
-                const sessionYear = sessionDate.getFullYear();
-                const sessionDay = sessionDate.getDate();
+    attendanceList.forEach(att => {
 
-                // Only add sessions for selected month
-                if (sessionMonth === Number(month) && sessionYear === Number(year)) {
-                    if (session.client_id === client.id) {
-                        map[client.id][sessionDay] = "P"; // Mark Present
-                    }
-                }
-            });
-        });
-        setAttendanceMap(map);
-    };
+        const date = new Date(att.attendance_date);
+
+        if (
+            date.getMonth() + 1 === Number(month) &&
+            date.getFullYear() === Number(year)
+        ) {
+
+            if (!map[att.client_id]) {
+
+                map[att.client_id] = {};
+
+            }
+
+            map[att.client_id][date.getDate()] = "P";
+
+        }
+
+    });
+
+    setAttendanceMap(map);
+
+};
+
 
     const daysInMonth = new Date(year, month, 0).getDate();
     const monthNames = [

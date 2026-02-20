@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import listEndpoints from "express-list-endpoints";
 import swaggerUi from "swagger-ui-express";
-
+import attendanceRoutes from "./src/routes/attendanceRoutes.js";
 import corsConfig from "./src/middlewares/corsConfig.js";
 import db from "./src/config/db.js";
 import authMiddleware from "./src/middlewares/authMiddleware.js";
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(corsConfig);
 app.use("/uploads", express.static("uploads"));
 app.use("/logos", express.static("uploads/logos"));
-
+app.use("/api/attendance", attendanceRoutes);
 
 /* ================= ROUTE MAP (IMPORTANT) ================= */
 const routers = [
@@ -34,6 +34,7 @@ const routers = [
   ["/api/client", authMiddleware, clientRoutes],
   ["/api/category", authMiddleware, categoryRoutes],
   ["/api/renew", authMiddleware, renewRoutes],
+  ["/api/attendance", authMiddleware, attendanceRoutes],
 ];
 
 
@@ -62,35 +63,45 @@ routers.forEach(route => {
     methods.forEach(m => {
       const method = m.toLowerCase();
 
-      swaggerPaths[fullPath][method] = {
-        summary: `${m} ${fullPath}`,
-        tags: [base.replace("/api/", "").toUpperCase()],
-        parameters: path.includes(":")
-          ? path
-              .split("/")
-              .filter(p => p.startsWith(":"))
-              .map(p => ({
-                name: p.slice(1),
-                in: "path",
-                required: true,
-                schema: { type: "string" },
-              }))
-          : [],
-        ...( ["post","put","patch"].includes(method) && {
-          requestBody: {
-            required: true,
-            content: {
-              "application/json": {
-                example: { note: "Add actual fields" }
-              }
-            }
-          }
-        }),
-        responses: {
-          200: { description: "Success" },
-          401: { description: "Unauthorized" }
-        },
-      };
+   swaggerPaths[fullPath][method] = {
+  summary: `${m} ${fullPath}`,
+  tags: [base.replace("/api/", "").toUpperCase()],
+
+  security: [
+    {
+      bearerAuth: []
+    }
+  ],
+
+  parameters: path.includes(":")
+    ? path
+        .split("/")
+        .filter(p => p.startsWith(":"))
+        .map(p => ({
+          name: p.slice(1),
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        }))
+    : [],
+
+  ...( ["post","put","patch"].includes(method) && {
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          example: { note: "Add actual fields" }
+        }
+      }
+    }
+  }),
+
+  responses: {
+    200: { description: "Success" },
+    401: { description: "Unauthorized" }
+  },
+};
+
     });
   });
 });
@@ -101,13 +112,31 @@ app.use(
   swaggerUi.setup({
     openapi: "3.0.0",
     info: {
-      title: "Ideal Profilers API",
+      title: "Sky Gym API",
       version: "1.0.0",
       description: "Multi-company Gym Management API"
     },
+
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }
+      }
+    },
+
+    security: [
+      {
+        bearerAuth: []
+      }
+    ],
+
     paths: swaggerPaths,
   })
 );
+
 
 /* ================= SERVER ================= */
 const PORT = process.env.PORT || 4002;
