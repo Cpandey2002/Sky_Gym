@@ -23,11 +23,11 @@ router.post("/", createEnquiry);
 
 router.get("/", getAllEnquiries);
 
-router.get("/:id", getEnquiryById);
+router.post("/get-by-id", getEnquiryById);
 
-router.put("/:id", updateEnquiryById);
+router.put("/", updateEnquiryById);
 
-router.delete("/:id", deleteEnquiryById);
+router.delete("/", deleteEnquiryById);
 
 
 export default router;

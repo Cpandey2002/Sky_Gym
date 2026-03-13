@@ -1,43 +1,27 @@
-import db from "../config/db.js";
 import jwt from "jsonwebtoken";
+import * as UserModel from "../models/userModel.js";
 
 
 // ✅ REGISTER
 export const registerUser = async (req, res) => {
+
   try {
 
-    const {
-      company_code,
-      company_name,
-      email,
-      address,
-      mobile_number,
-      password
-    } = req.body;
-
-    const [result] = await db.query(
-      `INSERT INTO users 
-      (company_code, company_name, email, address, mobile_number, password)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        company_code,
-        company_name,
-        email,
-        address,
-        mobile_number,
-        password
-      ]
-    );
+    const result =
+      await UserModel.registerUser(req.body);
 
     res.json({
-      message: "Registration successful"
+      message: "Registration successful",
+      id: result.insertId
     });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
 
+    res.status(500).json({ error: err.message });
+
+  }
+
+};
 
 
 // ✅ LOGIN
@@ -47,18 +31,16 @@ export const loginUser = async (req, res) => {
 
     const { company_code, password } = req.body;
 
-    const [rows] = await db.query(
-      "SELECT * FROM users WHERE company_code = ? AND password = ?",
-      [company_code, password]
-    );
+    const user =
+      await UserModel.loginUser(company_code, password);
 
-    if (rows.length === 0) {
+    if (!user) {
+
       return res.status(401).json({
         message: "Invalid company code or password"
       });
-    }
 
-    const user = rows[0];
+    }
 
     const token = jwt.sign(
       {
@@ -75,10 +57,12 @@ export const loginUser = async (req, res) => {
     });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
 
+    res.status(500).json({ error: err.message });
+
+  }
+
+};
 
 
 // ✅ GET PROFILE
@@ -88,30 +72,30 @@ export const getProfile = async (req, res) => {
 
     const company_code = req.user.company_code;
 
-    const [rows] = await db.query(
-      "SELECT * FROM users WHERE company_code = ?",
-      [company_code]
-    );
+    const user =
+      await UserModel.getProfile(company_code);
 
-    res.json(rows[0]);
+    res.json(user);
 
   } catch (err) {
+
     res.status(500).json({ error: err.message });
+
   }
+
 };
+
+
+// ✅ UPDATE PROFILE
 export const updateProfile = async (req, res) => {
 
   try {
 
     const company_code = req.user.company_code;
 
-    const { email, mobile_number, address } = req.body;
-
-    await db.query(
-      `UPDATE users 
-       SET email=?, mobile_number=?, address=? 
-       WHERE company_code=?`,
-      [email, mobile_number, address, company_code]
+    await UserModel.updateProfile(
+      company_code,
+      req.body
     );
 
     res.json({
@@ -120,16 +104,14 @@ export const updateProfile = async (req, res) => {
 
   } catch (err) {
 
-    res.status(500).json({
-      error: err.message
-    });
+    res.status(500).json({ error: err.message });
 
   }
 
 };
 
 
-// ✅ UPLOAD COMPANY LOGO
+// ✅ UPLOAD LOGO
 export const uploadLogo = async (req, res) => {
 
   try {
@@ -137,31 +119,26 @@ export const uploadLogo = async (req, res) => {
     const company_code = req.user.company_code;
 
     if (!req.file) {
+
       return res.status(400).json({
         message: "No file uploaded"
       });
+
     }
 
-    const logoName = req.file.filename;
-
-    // save logo name in DB (optional but recommended)
-    await db.query(
-      "UPDATE users SET logo = ? WHERE company_code = ?",
-      [logoName, company_code]
+    await UserModel.uploadLogo(
+      company_code,
+      req.file.filename
     );
 
     res.json({
       message: "Logo uploaded successfully",
-      logo: logoName
+      logo: req.file.filename
     });
 
   } catch (err) {
 
-    console.error(err);
-
-    res.status(500).json({
-      error: err.message
-    });
+    res.status(500).json({ error: err.message });
 
   }
 

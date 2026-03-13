@@ -9,8 +9,6 @@ import db from "../config/db.js";
 export const createClient = async (req, res) => {
 
   const conn = await db.getConnection();
-
-  // ✅ FIXED: use company_code from JWT
   const company_code = req.user.company_code;
 
   try {
@@ -24,16 +22,14 @@ export const createClient = async (req, res) => {
       photo: photoName
     };
 
-    // ✅ FIXED
     const [clientResult] = await ClientModel.create(
       clientData,
       company_code,
       conn
     );
 
-    const clientId = clientResult.insertId;
+    const clientId = clientResult[0].insertId;
 
-    // ✅ FIXED
     await RenewModel.create(
       { ...clientData, client_id: clientId },
       company_code,
@@ -50,8 +46,6 @@ export const createClient = async (req, res) => {
 
     await conn.rollback();
 
-    console.error(err);
-
     res.status(500).json({
       error: "Failed to create client"
     });
@@ -66,12 +60,13 @@ export const createClient = async (req, res) => {
 
 
 
-// ✅ GET ALL CLIENTS
+// ✅ GET ALL CLIENTS (BODY ONLY)
 export const getAllClients = async (req, res) => {
 
   const company_code = req.user.company_code;
 
-  const [rows] = await ClientModel.findAllByCompany(company_code);
+  const [rows] =
+    await ClientModel.findAllByCompany(company_code);
 
   res.json(rows);
 
@@ -79,22 +74,25 @@ export const getAllClients = async (req, res) => {
 
 
 
-// ✅ GET CLIENT BY ID
+// ✅ GET CLIENT BY ID (BODY ONLY)
 export const getClientById = async (req, res) => {
 
+  const { id } = req.body;   // ✅ FROM BODY
   const company_code = req.user.company_code;
 
-  const [rows] = await ClientModel.findById(
-    req.params.id,
-    company_code
-  );
+  if (!id) {
+    return res.status(400).json({
+      message: "Client id required"
+    });
+  }
+
+  const [rows] =
+    await ClientModel.findById(id, company_code);
 
   if (!rows.length) {
-
     return res.status(404).json({
       message: "Client not found"
     });
-
   }
 
   res.json(rows[0]);
@@ -103,15 +101,22 @@ export const getClientById = async (req, res) => {
 
 
 
-// ✅ UPDATE CLIENT
+// ✅ UPDATE CLIENT (BODY ONLY)
 export const updateClient = async (req, res) => {
 
+  const { id, ...updateData } = req.body;   // ✅ FROM BODY
   const company_code = req.user.company_code;
 
+  if (!id) {
+    return res.status(400).json({
+      message: "Client id required"
+    });
+  }
+
   await ClientModel.update(
-    req.params.id,
+    id,
     company_code,
-    req.body
+    updateData
   );
 
   res.json({
@@ -122,13 +127,20 @@ export const updateClient = async (req, res) => {
 
 
 
-// ✅ DELETE CLIENT
+// ✅ DELETE CLIENT (BODY ONLY)
 export const deleteClient = async (req, res) => {
 
+  const { id } = req.body;   // ✅ FROM BODY
   const company_code = req.user.company_code;
 
+  if (!id) {
+    return res.status(400).json({
+      message: "Client id required"
+    });
+  }
+
   await ClientModel.delete(
-    req.params.id,
+    id,
     company_code
   );
 

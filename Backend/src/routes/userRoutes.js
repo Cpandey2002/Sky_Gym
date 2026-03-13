@@ -4,13 +4,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 import upload from "../middlewares/uploadlogoMiddleware.js";
 
-import {
-  registerUser,
-  loginUser,
-  getProfile,
-  updateProfile,   // ✅ ADD THIS LINE
-  uploadLogo
-} from "../controllers/userController.js";
+import {registerUser,loginUser,getProfile,updateProfile, uploadLogo} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -20,7 +14,7 @@ router.post("/login", loginUser);
 
 router.get("/profile", authMiddleware, getProfile);
 
-router.put("/update-profile", authMiddleware, updateProfile); // ✅ FIXED
+router.put("/update-profile", authMiddleware, updateProfile); 
 
 router.post(
   "/upload-logo",

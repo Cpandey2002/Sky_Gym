@@ -1,94 +1,51 @@
 import RenewModel from "../models/RenewModel.js";
-import db from "../config/db.js";
 
 
-// ✅ CREATE RENEW
+// ✅ CREATE
 export const createRenew = async (req, res) => {
-
-  const conn = await db.getConnection();
-
-  const company_code = req.user.company_code;
 
   try {
 
-    await conn.beginTransaction();
-
-    // ✅ INSERT renew record
-    const [result] = await RenewModel.create(
+    const company_code = req.user.company_code;
+console.log("Payload:", req.body);
+    const [rows] = await RenewModel.create(
       req.body,
-      company_code,
-      conn
+      company_code
     );
-
-    // ✅ UPDATE client expiry date
-    await conn.query(
-      `
-      UPDATE client_registration
-      SET to_date = ?
-      WHERE id = ?
-      AND company_code = ?
-      `,
-      [
-        req.body.to_date,
-        req.body.client_id,
-        company_code
-      ]
-    );
-
-    await conn.commit();
 
     res.status(201).json({
-
       message: "Renew created successfully",
-
-      renew_id: result.insertId
-
+      renew_id: rows[0].insertId
     });
 
-  }
-  catch (error) {
-
-    await conn.rollback();
-
-    console.error("RENEW ERROR:", error);
+  } catch (error) {
 
     res.status(500).json({
-
-      error: "Failed to renew client"
-
+      error: "Failed to renew client",
+      console: error  
     });
-
-  }
-  finally {
-
-    conn.release();
 
   }
 
 };
 
 
-
-// ✅ GET ALL RENEW
+// ✅ GET ALL
 export const getAllRenew = async (req, res) => {
 
   try {
 
     const company_code = req.user.company_code;
 
-    const [rows] = await RenewModel.findAllByCompany(company_code);
+    const [rows] =
+      await RenewModel.findAllByCompany(company_code);
 
     res.json(rows);
 
-  }
-  catch (error) {
-
-    console.error(error);
+  } catch (error) {
 
     res.status(500).json({
-
       error: "Failed to fetch renew records"
-
     });
 
   }
@@ -96,32 +53,26 @@ export const getAllRenew = async (req, res) => {
 };
 
 
-
-// ✅ GET RENEW BY CLIENT
+// ✅ GET BY CLIENT (BODY ONLY)
 export const getRenewByClientId = async (req, res) => {
 
   try {
 
+    const { client_id } = req.body;
     const company_code = req.user.company_code;
 
-    const [rows] = await RenewModel.findByClientId(
-
-      req.params.client_id,
-      company_code
-
-    );
+    const [rows] =
+      await RenewModel.findByClientId(
+        client_id,
+        company_code
+      );
 
     res.json(rows);
 
-  }
-  catch (error) {
-
-    console.error(error);
+  } catch (error) {
 
     res.status(500).json({
-
       error: "Failed to fetch renew records"
-
     });
 
   }
@@ -129,37 +80,28 @@ export const getRenewByClientId = async (req, res) => {
 };
 
 
-
-// ✅ UPDATE RENEW
+// ✅ UPDATE (BODY ONLY)
 export const updateRenew = async (req, res) => {
 
   try {
 
+    const { id, ...data } = req.body;
     const company_code = req.user.company_code;
 
     await RenewModel.update(
-
-      req.params.id,
+      id,
       company_code,
-      req.body
-
+      data
     );
 
     res.json({
-
       message: "Renew updated successfully"
-
     });
 
-  }
-  catch (error) {
-
-    console.error(error);
+  } catch (error) {
 
     res.status(500).json({
-
       error: "Failed to update renew"
-
     });
 
   }
@@ -167,36 +109,27 @@ export const updateRenew = async (req, res) => {
 };
 
 
-
-// ✅ DELETE RENEW
+// ✅ DELETE (BODY ONLY)
 export const deleteRenew = async (req, res) => {
 
   try {
 
+    const { id } = req.body;
     const company_code = req.user.company_code;
 
     await RenewModel.delete(
-
-      req.params.id,
+      id,
       company_code
-
     );
 
     res.json({
-
       message: "Renew deleted successfully"
-
     });
 
-  }
-  catch (error) {
-
-    console.error(error);
+  } catch (error) {
 
     res.status(500).json({
-
       error: "Failed to delete renew"
-
     });
 
   }

@@ -8,37 +8,35 @@ const AttendanceModel = {
   getEmbeddingsByCompany: async (company_code) => {
 
     const [rows] = await db.query(
-      `SELECT 
-         id AS client_id,
-         member_id,
-         embedding
-       FROM client_registration
-       WHERE company_code = ?
-       AND embedding IS NOT NULL`,
-      [company_code]
+      "CALL sp_attendance('GET_EMBEDDINGS', 0, ?)",
+      [
+        JSON.stringify({
+          company_code
+        })
+      ]
     );
 
-    return rows;
+    return rows[0];
   },
 
 
   /* ===========================
      GET CLIENT BY MEMBER ID
   =========================== */
-getClientByMemberId: async (member_id, company_code) => {
+  getClientByMemberId: async (member_id, company_code) => {
 
-  const [rows] = await db.query(
-    `SELECT id, member_id, company_code
-     FROM client_registration
-     WHERE member_id = ?
-     AND company_code = ?`,
-    [member_id, company_code]
-  );
+    const [rows] = await db.query(
+      "CALL sp_attendance('GET_CLIENT', 0, ?)",
+      [
+        JSON.stringify({
+          member_id,
+          company_code
+        })
+      ]
+    );
 
-  return rows[0];
-
-},
-
+    return rows[0][0];
+  },
 
 
   /* ===========================
@@ -52,76 +50,73 @@ getClientByMemberId: async (member_id, company_code) => {
   ) => {
 
     const [rows] = await db.query(
-      `SELECT *
-       FROM gym_attendance
-       WHERE client_id = ?
-       AND member_id = ?
-       AND company_code = ?
-       AND attendance_date = ?`,
-      [client_id, member_id, company_code, attendance_date]
+      "CALL sp_attendance('GET_TODAY_ATTENDANCE', 0, ?)",
+      [
+        JSON.stringify({
+          client_id,
+          member_id,
+          company_code,
+          attendance_date
+        })
+      ]
     );
 
-    return rows[0];
+    return rows[0][0];
   },
 
 
   /* ===========================
      PUNCH IN
   =========================== */
- punchIn: async ({
-  client_id,
-  member_id,
-  company_code,
-  attendance_date,
-  clock_in
-}) => {
+  punchIn: async ({
+    client_id,
+    member_id,
+    company_code,
+    attendance_date,
+    clock_in
+  }) => {
 
-  await db.query(
-    `INSERT INTO gym_attendance
-     (client_id, member_id, company_code, attendance_date, clock_in)
-     VALUES (?, ?, ?, ?, ?)`,
-    [
-      client_id,
-      member_id,
-      company_code,
-      attendance_date,
-      clock_in
-    ]
-  );
+    await db.query(
+      "CALL sp_attendance('PUNCH_IN', 0, ?)",
+      [
+        JSON.stringify({
+          client_id,
+          member_id,
+          company_code,
+          attendance_date,
+          clock_in
+        })
+      ]
+    );
 
-}
-,
+  },
 
 
   /* ===========================
      PUNCH OUT
   =========================== */
-punchOut: async ({
-  client_id,
-  member_id,
-  company_code,
-  attendance_date,
-  clock_out
-}) => {
+  punchOut: async ({
+    client_id,
+    member_id,
+    company_code,
+    attendance_date,
+    clock_out
+  }) => {
 
-  await db.query(
-    `UPDATE gym_attendance
-     SET clock_out = ?
-     WHERE client_id = ?
-     AND member_id = ?
-     AND company_code = ?
-     AND attendance_date = ?
-     AND clock_out IS NULL`,
-    [
-      clock_out,
-      client_id,
-      member_id,
-      company_code,
-      attendance_date
-    ]
-  );
+    await db.query(
+      "CALL sp_attendance('PUNCH_OUT', 0, ?)",
+      [
+        JSON.stringify({
+          client_id,
+          member_id,
+          company_code,
+          attendance_date,
+          clock_out
+        })
+      ]
+    );
 
-},
+  },
 
 
   /* ===========================
@@ -130,24 +125,15 @@ punchOut: async ({
   getAttendanceByCompany: async (company_code) => {
 
     const [rows] = await db.query(
-      `SELECT 
-         ga.id,
-         ga.client_id,
-         ga.member_id,
-         ga.company_code,
-         ga.attendance_date,
-         ga.clock_in,
-         ga.clock_out,
-         cr.client_name
-       FROM gym_attendance ga
-       JOIN client_registration cr
-       ON ga.client_id = cr.id
-       WHERE ga.company_code = ?
-       ORDER BY ga.attendance_date DESC`,
-      [company_code]
+      "CALL sp_attendance('GET_ALL_ATTENDANCE', 0, ?)",
+      [
+        JSON.stringify({
+          company_code
+        })
+      ]
     );
 
-    return rows;
+    return rows[0];
   }
 
 };

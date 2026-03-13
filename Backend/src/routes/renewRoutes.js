@@ -17,10 +17,10 @@ router.post("/", createRenew);
 
 router.get("/", getAllRenew);
 
-router.get("/client/:client_id", getRenewByClientId);
+router.get("/client", getRenewByClientId);
 
-router.put("/:id", updateRenew);
+router.put("/", updateRenew);
 
-router.delete("/:id", deleteRenew);
+router.delete("/", deleteRenew);
 
 export default router;

@@ -1,34 +1,73 @@
 import db from "../config/db.js";
 
 export const registerUser = async (userData) => {
-  const {
-    company_code,
-    company_name,
-    email,
-    address,
-    password,
-    mobile_number,
-    logo
-  } = userData;
 
-  const [result] = await db.query(
-    `INSERT INTO users 
-    (company_code, company_name, email, address, password, mobile_number, logo)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [company_code, company_name, email, address, password, mobile_number, logo]
+  const [rows] = await db.query(
+    "CALL sp_user('REGISTER', 0, ?)",
+    [JSON.stringify(userData)]
   );
 
-  return result;
+  return rows[0];
+
 };
 
 
 export const loginUser = async (company_code, password) => {
 
   const [rows] = await db.query(
-    `SELECT * FROM users 
-     WHERE company_code=? AND password=?`,
-    [company_code, password]
+    "CALL sp_user('LOGIN', 0, ?)",
+    [
+      JSON.stringify({
+        company_code,
+        password
+      })
+    ]
   );
 
-  return rows[0];
+  return rows[0][0];
+
+};
+
+
+export const getProfile = async (company_code) => {
+
+  const [rows] = await db.query(
+    "CALL sp_user('GET_PROFILE', 0, ?)",
+    [
+      JSON.stringify({ company_code })
+    ]
+  );
+
+  return rows[0][0];
+
+};
+
+
+export const updateProfile = async (company_code, data) => {
+
+  return db.query(
+    "CALL sp_user('UPDATE_PROFILE', 0, ?)",
+    [
+      JSON.stringify({
+        ...data,
+        company_code
+      })
+    ]
+  );
+
+};
+
+
+export const uploadLogo = async (company_code, logo) => {
+
+  return db.query(
+    "CALL sp_user('UPLOAD_LOGO', 0, ?)",
+    [
+      JSON.stringify({
+        company_code,
+        logo
+      })
+    ]
+  );
+
 };

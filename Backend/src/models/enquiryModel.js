@@ -4,85 +4,55 @@ const Enquiry = {
 
   create: async (data) => {
 
-    const sql = `
-      INSERT INTO enquiry 
-      (client_name, email, mobile, enquiry_date, address, enquiry_received_from, company_code)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
+    const [rows] = await db.query(
+      "CALL sp_enquiry('CREATE', 0, ?)",
+      [
+        JSON.stringify(data)
+      ]
+    );
 
-    const [result] = await db.query(sql, [
-
-      data.client_name,
-      data.email,
-      data.mobile,
-      data.enquiry_date,
-      data.address,
-      data.enquiry_received_from,
-      data.company_code
-
-    ]);
-
-    return result;
-
+    return rows[0];
   },
 
 
   getAllByCompany: async (company_code) => {
 
     const [rows] = await db.query(
-
-      "SELECT * FROM enquiry WHERE company_code = ? ORDER BY id DESC",
-
-      [company_code]
-
+      "CALL sp_enquiry('GET_ALL', 0, ?)",
+      [
+        JSON.stringify({ company_code })
+      ]
     );
 
     return rows;
-
   },
 
 
   getById: async (id, company_code) => {
 
     const [rows] = await db.query(
-
-      "SELECT * FROM enquiry WHERE id = ? AND company_code = ?",
-
-      [id, company_code]
-
+      "CALL sp_enquiry('GET_BY_ID', ?, ?)",
+      [
+        id,
+        JSON.stringify({ company_code })
+      ]
     );
 
     return rows;
-
   },
 
 
   updateById: async (id, company_code, data) => {
 
     return db.query(
-
-      `UPDATE enquiry SET
-       client_name=?,
-       email=?,
-       mobile=?,
-       enquiry_date=?,
-       address=?,
-       enquiry_received_from=?
-       WHERE id=? AND company_code=?`,
-
+      "CALL sp_enquiry('UPDATE', ?, ?)",
       [
-
-        data.client_name,
-        data.email,
-        data.mobile,
-        data.enquiry_date,
-        data.address,
-        data.enquiry_received_from,
         id,
-        company_code
-
+        JSON.stringify({
+          ...data,
+          company_code
+        })
       ]
-
     );
 
   },
@@ -91,11 +61,11 @@ const Enquiry = {
   deleteById: async (id, company_code) => {
 
     return db.query(
-
-      "DELETE FROM enquiry WHERE id=? AND company_code=?",
-
-      [id, company_code]
-
+      "CALL sp_enquiry('DELETE', ?, ?)",
+      [
+        id,
+        JSON.stringify({ company_code })
+      ]
     );
 
   }
