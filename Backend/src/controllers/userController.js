@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import * as UserModel from "../models/userModel.js";
 
-
 // ✅ REGISTER
 export const registerUser = async (req, res) => {
 

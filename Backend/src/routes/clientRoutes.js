@@ -61,7 +61,7 @@ router.post("/check-member", async (req, res) => {
 /* =================================
    GET ALL CLIENTS
 ================================= */
-router.post("/get-all", getAllClients);
+router.get("/get-all", getAllClients);
 
 
 /* =================================

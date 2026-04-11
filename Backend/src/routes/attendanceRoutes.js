@@ -7,8 +7,9 @@ router.post("/qr-auto-punch", AttendanceController.qrAutoPunch);
 
 router.post("/face-punch", AttendanceController.facePunch);
 
-router.put( "/update-embedding", AttendanceController.updateEmbedding
-);
+router.put( "/update-embedding", AttendanceController.updateEmbedding);
+
+router.post("/get-embedding", AttendanceController.getEmbeddingsByCompany);
 
 router.get("/", AttendanceController.getAttendance);
 

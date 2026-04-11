@@ -14,7 +14,7 @@ export const addClient = async (data) => {
 };
 
 export const getAllClients = async () => {
-  const res = await axiosInstance.get("/client");
+  const res = await axiosInstance.get("/client/get-all");
   return res.data;
 };
 

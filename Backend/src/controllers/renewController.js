@@ -7,7 +7,6 @@ export const createRenew = async (req, res) => {
   try {
 
     const company_code = req.user.company_code;
-console.log("Payload:", req.body);
     const [rows] = await RenewModel.create(
       req.body,
       company_code

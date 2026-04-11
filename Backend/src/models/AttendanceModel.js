@@ -64,77 +64,55 @@ const AttendanceModel = {
     return rows[0][0];
   },
 
+  gymPunch :async (data) => {
+    try {
 
-  /* ===========================
-     PUNCH IN
-  =========================== */
-  punchIn: async ({
-    client_id,
-    member_id,
-    company_code,
-    attendance_date,
-    clock_in
-  }) => {
+      const result = await db.query(
+        "CALL sp_attendance('AUTO_PUNCH_DECISION', 0, ?)",
+        [JSON.stringify(data)]
+      );
 
-    await db.query(
-      "CALL sp_attendance('PUNCH_IN', 0, ?)",
-      [
-        JSON.stringify({
-          client_id,
-          member_id,
-          company_code,
-          attendance_date,
-          clock_in
-        })
-      ]
-    );
+      return result;
 
+    } catch (err) {
+      console.error("❌ Model Error:", err);
+      throw err;
+    }
   },
-
-
   /* ===========================
-     PUNCH OUT
-  =========================== */
-  punchOut: async ({
-    client_id,
-    member_id,
-    company_code,
-    attendance_date,
-    clock_out
-  }) => {
+   UPDATE EMBEDDING
+=========================== */
 
-    await db.query(
-      "CALL sp_attendance('PUNCH_OUT', 0, ?)",
-      [
-        JSON.stringify({
-          client_id,
-          member_id,
-          company_code,
-          attendance_date,
-          clock_out
-        })
-      ]
-    );
+updateEmbedding: async (data) => {
+  const [rows] = await db.query(
+    "CALL sp_attendance('UPDATE_EMBEDDING', 0, ?)",
+    [
+      JSON.stringify({
+        member_id: data.member_id,
+        company_code: data.company_code,
+        embedding: data.embedding
+      })
+    ]
+  );
 
-  },
+  return rows;
+},
 
-
-  /* ===========================
-     GET ALL ATTENDANCE
-  =========================== */
-  getAttendanceByCompany: async (company_code) => {
-
-    const [rows] = await db.query(
-      "CALL sp_attendance('GET_ALL_ATTENDANCE', 0, ?)",
-      [
-        JSON.stringify({
-          company_code
-        })
-      ]
-    );
-
-    return rows[0];
-  }
+/* ===========================
+   GET ALL ATTENDANCE
+=========================== */
+getAttendanceByCompany: async (company_code) => {
+  const [rows] = await db.query(
+    "CALL sp_attendance('GET_ALL_ATTENDANCE', 0, ?)",
+    [
+      JSON.stringify({
+        company_code
+      })
+    ]
+  );
+  console.log("Attendance Rows:", rows);
+  return rows[0];
+}
 
 };
 

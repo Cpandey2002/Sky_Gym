@@ -2,19 +2,17 @@ import db from "../config/db.js";
 
 class RenewModel {
 
-  static create(data, company_code) {
-
-    return db.query(
-      "CALL sp_renew('CREATE', 0, ?)",
-      [
-        JSON.stringify({
-          ...data,
-          company_code
-        })
-      ]
-    );
-
-  }
+  static create(data, company_code, conn) {
+  return conn.query(
+    "CALL sp_renew('CREATE', 0, ?)",
+    [
+      JSON.stringify({
+        ...data,
+        company_code
+      })
+    ]
+  );
+}
 
   static findAllByCompany(company_code) {
 

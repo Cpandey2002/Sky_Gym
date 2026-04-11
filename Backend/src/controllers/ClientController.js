@@ -1,5 +1,3 @@
-// src/controllers/ClientController.js
-
 import ClientModel from "../models/ClientModel.js";
 import RenewModel from "../models/RenewModel.js";
 import db from "../config/db.js";
@@ -7,12 +5,10 @@ import db from "../config/db.js";
 
 // ✅ CREATE CLIENT
 export const createClient = async (req, res) => {
-
   const conn = await db.getConnection();
-  const company_code = req.user.company_code;
+  const company_code = req.user?.company_code;
 
   try {
-
     await conn.beginTransaction();
 
     const photoName = req.file ? req.file.filename : null;
@@ -22,43 +18,65 @@ export const createClient = async (req, res) => {
       photo: photoName
     };
 
+    // ✅ CLIENT INSERT
     const [clientResult] = await ClientModel.create(
       clientData,
       company_code,
       conn
     );
 
-    const clientId = clientResult[0].insertId;
 
-    await RenewModel.create(
-      { ...clientData, client_id: clientId },
+    const clientId = clientResult?.[0]?.[0]?.insertId;
+
+    if (!clientId) {
+      throw new Error("Client insertId not found!");
+    }
+
+
+    // ✅ RENEW INSERT
+    const renewPayload = {
+      ...clientData,
+      client_id: clientId
+    };
+
+
+    const [renewResult] = await RenewModel.create(
+      renewPayload,
       company_code,
       conn
     );
 
+
     await conn.commit();
 
     res.status(201).json({
-      message: "Client created successfully"
+      message: "Client & Renew created successfully",
+      clientId
     });
 
   } catch (err) {
 
+    console.error("❌ FULL ERROR OBJECT:");
+    console.error(err);
+
+    console.error("❌ ERROR MESSAGE:", err.message);
+    console.error("❌ ERROR CODE:", err.code);
+    console.error("❌ SQL MESSAGE:", err.sqlMessage);
+    console.error("❌ SQL STATE:", err.sqlState);
+    console.error("❌ STACK:", err.stack);
+
     await conn.rollback();
 
     res.status(500).json({
-      error: "Failed to create client"
+      error: err.message,
+      code: err.code,
+      sqlMessage: err.sqlMessage
     });
 
   } finally {
-
     conn.release();
-
   }
-
 };
-
-
 
 // ✅ GET ALL CLIENTS (BODY ONLY)
 export const getAllClients = async (req, res) => {
@@ -77,7 +95,7 @@ export const getAllClients = async (req, res) => {
 // ✅ GET CLIENT BY ID (BODY ONLY)
 export const getClientById = async (req, res) => {
 
-  const { id } = req.body;   // ✅ FROM BODY
+  const { id } = req.body;   
   const company_code = req.user.company_code;
 
   if (!id) {
