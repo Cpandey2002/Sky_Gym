@@ -11,6 +11,8 @@ router.put( "/update-embedding", AttendanceController.updateEmbedding);
 
 router.post("/get-embedding", AttendanceController.getEmbeddingsByCompany);
 
-router.get("/", AttendanceController.getAttendance);
+router.post("/daily-attendance", AttendanceController.getDailyAttendance);
+
+router.post("/monthly-attendance", AttendanceController.getMonthlyAttendance);
 
 export default router;

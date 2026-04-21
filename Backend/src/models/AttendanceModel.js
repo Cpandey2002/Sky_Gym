@@ -98,21 +98,46 @@ updateEmbedding: async (data) => {
   return rows;
 },
 
-/* ===========================
-   GET ALL ATTENDANCE
-=========================== */
-getAttendanceByCompany: async (company_code) => {
-  const [rows] = await db.query(
-    "CALL sp_attendance('GET_ALL_ATTENDANCE', 0, ?)",
-    [
-      JSON.stringify({
-        company_code
-      })
-    ]
-  );
-  console.log("Attendance Rows:", rows);
-  return rows[0];
-}
+  /* ============================
+     DAILY ATTENDANCE
+  ============================ */
+  
+  getDailyAttendance: async (payload) => {
+    try {
+      const [rows] = await db.query(
+        "CALL sp_attendance(?, ?, ?)",
+        [
+          "GET_DAILY_ATTENDANCE",
+          0,
+          JSON.stringify(payload)
+        ]
+      );
+
+      return rows[0]; // important (SP returns nested array)
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /* ============================
+     MONTHLY ATTENDANCE
+  ============================ */
+  getMonthlyAttendance: async (payload) => {
+    try {
+      const [rows] = await db.query(
+        "CALL sp_attendance(?, ?, ?)",
+        [
+          "GET_MONTHLY_ATTENDANCE",
+          0,
+          JSON.stringify(payload)
+        ]
+      );
+
+      return rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
 
 };
 

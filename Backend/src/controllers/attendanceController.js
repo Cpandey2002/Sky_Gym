@@ -11,6 +11,7 @@ const euclideanDistance = (a, b) => {
   }
   return Math.sqrt(sum);
 };
+
 const AttendanceController = {
 
   /* ===========================
@@ -43,6 +44,7 @@ const AttendanceController = {
     /* ====================
        FIRST SCAN → PUNCH IN
     ==================== */
+    
     if (!attendance) {
       await AttendanceModel.punchIn({
         client_id,
@@ -79,9 +81,7 @@ const AttendanceController = {
           time_passed: `${minutes_passed} min ${seconds_passed} sec`
         };
       }
-
       /* ALLOW PUNCH OUT */
-
       await AttendanceModel.punchOut({
         client_id,
         member_id,
@@ -115,31 +115,26 @@ const AttendanceController = {
 
 qrAutoPunch: async (req, res) => {
   try {
-    const { client_id, company_code , member_id} = req.body;
+    const { client_id, company_code } = req.body;
     if (!client_id || !company_code) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields"
       });
     }
-    // ✅ IST Time
     const now = new Date();
     const ist = new Date(
       now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
     );
     const today_date = ist.toLocaleDateString("en-CA"); // YYYY-MM-DD
     const current_time = ist.toTimeString().split(" ")[0];
-    // ✅ Payload for SP
     const payload = {
       client_id,
       company_code,
       today_date,
-      current_time,
-      member_id
+      current_time
     };
-    // ✅ Single SP call
     const result = await AttendanceModel.gymPunch(payload);
-    // 👉 Extract response
     const response = result?.[0]?.[0]?.[0];
     if (!response) {
       return res.json({
@@ -294,25 +289,68 @@ qrAutoPunch: async (req, res) => {
     }
   },
 
-  /* ===========================
-     GET ATTENDANCE
-  =========================== */
-
-  getAttendance: async (req, res) => {
+getDailyAttendance: async (req, res) => {
     try {
-      const { company_code } = req.body;
-      const rows =
-        await AttendanceModel.getAttendanceByCompany(
-          company_code
-        );
-      res.json(rows);
-    } catch (err) {
-      res.status(500).json({
+      const { company_code, attendance_date } = req.body;
+
+      if (!company_code || !attendance_date) {
+        return res.status(400).json({
+          success: false,
+          message: "company_code and attendance_date are required"
+        });
+      }
+
+      const data = await AttendanceModel.getDailyAttendance({
+        ...req.body
+      });
+
+      return res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (error) {
+      console.error("Daily Attendance Error:", error);
+      return res.status(500).json({
         success: false,
-        message: err.message
+        message: "Internal Server Error"
       });
     }
   },
+
+
+  /* ============================
+     MONTHLY ATTENDANCE
+  ============================ */
+  getMonthlyAttendance: async (req, res) => {
+    try {
+      const { company_code, month, year } = req.body;
+
+      if (!company_code || !month || !year) {
+        return res.status(400).json({
+          success: false,
+          message: "company_code, month and year are required"
+        });
+      }
+
+      const data = await AttendanceModel.getMonthlyAttendance({
+          ...req.body
+      });
+
+      return res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (error) {
+      console.error("Monthly Attendance Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error"
+      });
+    }
+  }
+,
 
    getEmbeddingsByCompany : async (req, res) => {
   try {
