@@ -30,42 +30,45 @@ export default function AttendanceReport() {
         loadData();
     }, [month, year]);
 const loadData = async () => {
+  setLoading(true);
 
-    setLoading(true);
+  try {
+    const attendanceRes = await getAttendance(
+      String(month).padStart(2, "0"),
+      String(year)
+    );
 
-    try {
+    const attendanceList = attendanceRes.data || [];
 
-        const clientRes = await getAllClients();
+    // ✅ use attendance data as clients
+    const uniqueClients = [];
 
-        // ✅ correct API call
-        const attendanceRes = await getAttendance();
+const map = {};
 
-        const attendanceList = attendanceRes || [];
+attendanceList.forEach((item) => {
+  if (!map[item.client_id]) {
+    map[item.client_id] = true;
+    uniqueClients.push({
+      client_id: item.client_id,
+      client_name: item.client_name
+    });
+  }
+});
 
-        setClients(clientRes);
+setClients(uniqueClients);
 
-        setSessions(attendanceList);
+    generateAttendanceMap(attendanceList);
 
-        generateAttendanceMap(clientRes, attendanceList);
-
-    }
-    catch (error) {
-
-        console.log("Error loading data:", error);
-
-    }
-    finally {
-
-        setLoading(false);
-
-    }
-
+  } catch (error) {
+    console.log("Error loading data:", error);
+  } finally {
+    setLoading(false);
+  }
 };
-
     // -----------------------------------------
     // Convert all sessions → { client_id: { day: "P" } }
     // -----------------------------------------
-const generateAttendanceMap = (clientList, attendanceList) => {
+const generateAttendanceMap = (attendanceList) => {
 
     const map = {};
 
@@ -152,7 +155,7 @@ const generateAttendanceMap = (clientList, attendanceList) => {
             const row = [client.client_name];
 
             [...Array(daysInMonth)].forEach((_, day) => {
-                const isPresent = attendanceMap[client.id]?.[day + 1] === "P";
+                const isPresent = attendanceMap[client.client_id]?.[day + 1] === "P";
                 if (isPresent) presentCount++;
                 row.push(isPresent ? "P" : "A");
             });
@@ -222,7 +225,7 @@ const generateAttendanceMap = (clientList, attendanceList) => {
             margin: { top: 30 },
         });
 
-        // ✅ Download PDF
+        // Download PDF
         doc.save(`Attendance_Report_${monthName}_${year}.pdf`);
     };
 
@@ -399,7 +402,7 @@ const generateAttendanceMap = (clientList, attendanceList) => {
 
                                         return (
                                             <tr
-                                                key={client.id}
+                                                key={client.client_id}
                                                 className="hover:bg-indigo-50 transition-all border-b border-indigo-200"
                                             >
 
@@ -414,7 +417,7 @@ const generateAttendanceMap = (clientList, attendanceList) => {
                                                         new Date(year, month - 1, day + 1).getDay() === 0;
 
                                                     const isPresent =
-                                                        attendanceMap[client.id]?.[day + 1] === "P";
+                                                        attendanceMap[client.client_id]?.[day + 1] === "P";
 
                                                     if (isPresent) presentCount++;
 
