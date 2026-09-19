@@ -140,26 +140,29 @@ export const validateDOB = (value = "") => {
 };
 
 export const validateAmount = (value = "") => {
-  if (!value) return "Amount required";
+    if (value === "" || value === null || value === undefined) {
+        return "Amount required";
+    }
 
-  // Allow only numbers with optional decimals (00 or 00.00)
-  if (!/^\d+(\.\d{1,2})?$/.test(value)) {
-    return "Invalid amount";
-  }
+    // Allow numbers with optional decimal (e.g. 1000 or 1000.00)
+    if (!/^\d+(\.\d{1,2})?$/.test(String(value))) {
+        return "Invalid amount";
+    }
 
-  const num = parseFloat(value);
+    const num = parseFloat(value);
 
-  // LIMIT: Max 1 lakh
-  if (num > 100000) {
-    return "Amount cannot exceed 1,00,000";
-  }
+    // Max 1 lakh
+    if (num > 100000) {
+        return "Amount cannot exceed 1,00,000";
+    }
 
-  if (num <= 0) {
-    return "Amount must be greater than 0";
-  }
+    if (num <= 0) {
+        return "Amount must be greater than 0";
+    }
 
-  return "";
+    return "";
 };
+
 
 export const validateSessions = (value = "") => {
   if (!value) return "Sessions required";

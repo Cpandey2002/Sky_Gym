@@ -3,8 +3,9 @@ import Sidebar from "../Components/Sidebar";
 import Topbar from '../Components/Topbar';
 import Table from '../Components/UI/Table';
 import ActionButtons from '../Components/UI/ActionButtons';
+import { UPLOAD_URL } from "../API/config";
 import Modal from '../Components/UI/Model';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAllClients } from '../API/Client';
 import {
     Funnel,
@@ -61,6 +62,10 @@ export default function ClientDetails() {
     // };
 
     const navigate = useNavigate();
+
+    const location = useLocation();
+
+    const selectedClientId = location.state?.clientId;
 
     const handleUpdate = (row) => {
         navigate(`/update-client/${row.id}`);
@@ -204,7 +209,11 @@ export default function ClientDetails() {
         return 3;                      // ✅ Active → LAST
     };
 
-    const filteredAndSortedClients = [...allClients]
+    const filteredAndSortedClients = selectedClientId
+        ? allClients.filter(
+            (client) => String(client.id) === String(selectedClientId)
+        )
+        : [...allClients];
 
     let sortedClients = [...filteredAndSortedClients];
 
@@ -231,7 +240,7 @@ export default function ClientDetails() {
 
             if (statusFilter === "expired") return priority === 1;
             if (statusFilter === "expiring") return priority === 2;
-            if (statusFilter === "active") { return priority === 2 || priority === 3; }
+            if (statusFilter === "active") { return priority === 3 || priority === 3; }
 
             return true; // all
         })
@@ -312,7 +321,7 @@ export default function ClientDetails() {
                     title="Clients List"
                 />
 
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md mb-6">
 
                     <Table
                         tableTitle="Clients Details"
@@ -348,15 +357,35 @@ export default function ClientDetails() {
                             ),
                             photo: (
                                 <div className="flex justify-center">
-                                    <img
-                                        src={`http://localhost:4002/uploads/client/${client.member_id.replace(/\//g, "")}.png`}
+                                    <div className="w-10 h-10 rounded-full border overflow-hidden bg-gray-100 flex items-center justify-center">
+                                        {client.photo ? (
+                                            <img
+                                                src={`${UPLOAD_URL}/${client.photo}`}
+                                                alt="client"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = "none";
+                                                    e.currentTarget.nextElementSibling.style.display = "flex";
+                                                }}
+                                            />
+                                        ) : null}
 
-                                        alt="client"
-                                        className="w-10 h-10 rounded-full object-cover border"
-                                        onError={(e) => {
-                                            e.target.src = "/default-avatar.png";
-                                        }}
-                                    />
+                                        <div
+                                            className="w-full h-full items-center justify-center text-gray-600 font-semibold text-sm"
+                                            style={{ display: client.photo ? "none" : "flex" }}
+                                        >
+                                            {(() => {
+                                                const name = client.client_name?.trim().split(/\s+/) || [];
+                                                const first = name[0]?.charAt(0) || "";
+                                                const last =
+                                                    name.length > 1
+                                                        ? name[name.length - 1]?.charAt(0)
+                                                        : "";
+
+                                                return `${first}${last}`.toUpperCase();
+                                            })()}
+                                        </div>
+                                    </div>
                                 </div>
                             ),
 
@@ -367,27 +396,27 @@ export default function ClientDetails() {
                                     onUpdate={() => handleUpdate(client)}
                                 />
                             ),
-                            action: (
-                                <ActionButtons
-                                    showRenew={true}
-                                    onRenew={() => handleRenew(client)}
-                                />
-                            ),
+                            // action: (
+                            //     <ActionButtons
+                            //         showRenew={true}
+                            //         onRenew={() => handleRenew(client)}
+                            //     />
+                            // ),
 
-                            action1: (
-                                <ActionButtons
-                                    showUpdate={true}
-                                    onUpdate={() => handleUpdate(client)}
-                                />
-                            ),
+                            // action1: (
+                            //     <ActionButtons
+                            //         showUpdate={true}
+                            //         onUpdate={() => handleUpdate(client)}
+                            //     />
+                            // ),
                         }))}
                         loading={tableLoader}
 
                         headerActions={
-                            <>
+                            <div className="flex flex-nowrap items-center gap-2">
                                 <button
                                     onClick={() => setStatusFilter("all")}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium
+                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "all"
                                             ? "bg-gray-700 text-white"
                                             : "bg-gray-100 text-gray-700"}`}
@@ -397,7 +426,7 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("expired")}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium
+                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "expired"
                                             ? "bg-red-600 text-white"
                                             : "bg-red-100 text-red-700"}`}
@@ -407,7 +436,7 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("expiring")}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium
+                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "expiring"
                                             ? "bg-yellow-500 text-white"
                                             : "bg-yellow-100 text-yellow-800"}`}
@@ -417,14 +446,14 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("active")}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium
+                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "active"
                                             ? "bg-green-600 text-white"
                                             : "bg-green-100 text-green-700"}`}
                                 >
                                     Active - {activeCount + expiringCount}
                                 </button>
-                            </>
+                            </div>
                         }
                     />
 

@@ -337,7 +337,7 @@ const generateAttendanceMap = (attendanceList) => {
                                 <tr>
 
                                     {/* ✅ Client Name Sticky Column */}
-                                    <th className="border border-indigo-400 px-5 py-4 text-left sticky left-0 bg-[#1e4543] z-40 shadow-xl">
+                                    <th className="border border-indigo-400 px-5 py-4 text-left sticky left-0 bg-black z-40 shadow-xl">
                                         <div className="flex items-center gap-2 font-bold text-base tracking-wide">
                                             <CalendarDays size={18} />
                                             Client Name
@@ -358,7 +358,7 @@ const generateAttendanceMap = (attendanceList) => {
                                                 className={`border border-indigo-300 px-3 py-2 text-center transition-all
                                                    ${isSunday
                                                         ? "bg-[#ff000c] text-white shadow-md"
-                                                        : "bg-[#1e4543]"
+                                                        : "bg-black"
                                                     }`}
                                             >
                                                 <div className="flex flex-col items-center leading-tight">

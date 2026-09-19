@@ -25,6 +25,7 @@ import {
 } from "../utils/validators";
 import { useLocation } from "react-router-dom";
 import { UPLOAD_URL } from "../API/config";
+import DateField from '../Components/UI/DateField';
 
 
 export default function Registration() {
@@ -59,9 +60,9 @@ export default function Registration() {
         if (enquiry) {
 
             const generatedId = generateMemberId(
-    enquiry.client_name || "",
-    enquiry.mobile || ""
-);
+                enquiry.client_name || "",
+                enquiry.mobile || ""
+            );
 
 
             setFormData((prev) => ({
@@ -105,22 +106,39 @@ export default function Registration() {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // 🔥 Convert to Sentence Case
         const toSentenceCase = (str = "") => {
             if (!str) return "";
             return str.charAt(0).toUpperCase() + str.slice(1);
         };
 
-        // Fields that should be sentence case
-        const sentenceFields = ["client_name", "address", "enquiry_received_from"];
+        const sentenceFields = [
+            "client_name",
+            "address",
+            "enquiry_received_from"
+        ];
 
         const finalValue = sentenceFields.includes(name)
             ? toSentenceCase(value)
             : value;
 
-        let updatedData = { ...formData, [name]: finalValue };
+        let updatedData = {
+            ...formData,
+            [name]: finalValue
+        };
 
-        // ✅ AUTO CALCULATE TO DATE (FROM DATE + MONTHS)
+        // =========================
+        // MEMBER ID
+        // =========================
+        if (name === "client_name" || name === "mobile") {
+            updatedData.member_id = generateMemberId(
+                updatedData.client_name,
+                updatedData.mobile
+            );
+        }
+
+        // =========================
+        // TO DATE
+        // =========================
         if (
             (name === "from_date" || name === "duration") &&
             updatedData.from_date &&
@@ -129,58 +147,74 @@ export default function Registration() {
             const from = new Date(updatedData.from_date);
             const months = parseInt(updatedData.duration);
 
-            const toDate = new Date(from);
-            toDate.setMonth(toDate.getMonth() + months);
+            if (!isNaN(from.getTime()) && !isNaN(months)) {
+                const toDate = new Date(from);
+                toDate.setMonth(toDate.getMonth() + months);
 
-            updatedData.to_date = toDate.toISOString().split("T")[0];
-        }
-
-        // ✅ AUTO GENERATE MEMBER ID
-        if (name === "client_name" || name === "mobile") {
-            updatedData.member_id = generateMemberId(
-                updatedData.client_name,
-                updatedData.mobile
-            );
-        }
-
-        setFormData(updatedData);
-
-        // 🧹 CLEAR ERROR FOR DOB WHEN USER TYPES
-        if (name === "dob") {
-            setErrors((prev) => ({
-                ...prev,
-                dob: "",
-            }));
-            return; // ❗ Stop further validation for DOB onChange
-        }
-
-
-        // When category changes → auto-fill amount
-        if (name === "category_id") {
-            const selected = category.find((cat) => cat.id == value);
-
-            if (selected) {
-                updatedData.amount = selected.amount;
+                updatedData.to_date = toDate
+                    .toISOString()
+                    .split("T")[0];
             }
         }
 
-        // ✅ AUTO CALCULATE FINAL AMOUNT (amount - discount)
-        if (name === "discount" || name === "amount") {
-            const discount = Number(updatedData.discount || 0);
+        // =========================
+        // CATEGORY → AMOUNT
+        // =========================
+        if (name === "category_id") {
+            const selected = category.find(
+                (cat) => String(cat.id) === String(value)
+            );
+
+            if (selected) {
+                updatedData.amount = String(selected.amount ?? "");
+            }
+        }
+
+        // =========================
+        // DISCOUNT / FINAL AMOUNT
+        // =========================
+        if (
+            name === "discount" ||
+            name === "amount" ||
+            name === "category_id"
+        ) {
             const amount = Number(updatedData.amount || 0);
+            const discount = Number(updatedData.discount || 0);
 
             const finalAmount = amount - discount;
 
-            updatedData.discount_price = finalAmount >= 0 ? finalAmount : 0;
+            updatedData.discount_price =
+                finalAmount >= 0
+                    ? finalAmount.toFixed(2)
+                    : "0.00";
         }
 
+        // =========================
+        // SET FORM DATA ONLY ONCE
+        // =========================
+        setFormData(updatedData);
 
-        // 🔥 LIVE VALIDATION (use finalValue to validate)
+        // =========================
+        // CLEAR DOB ERROR
+        // =========================
+        if (name === "dob") {
+            setErrors((prev) => ({
+                ...prev,
+                dob: ""
+            }));
+            return;
+        }
+
+        // =========================
+        // VALIDATE CURRENT FIELD
+        // =========================
         setErrors((prev) => ({
             ...prev,
-            [name]: validateField(name, finalValue),
+            [name]: validateField(name, finalValue)
         }));
     };
+
+
 
 
     const validateField = (name, value) => {
@@ -189,7 +223,7 @@ export default function Registration() {
             case "address": return validateAddress(value);
             case "mobile": return validateMobile(value);
             case "email": return validateEmail(value);
-            case "enquiry_received_from": return validateReceivedFrom(value);
+            // case "enquiry_received_from": return validateReceivedFrom(value);
             case "enquiry_date": return validateNotFutureDate(value);
             case "reg_date": return validateNotFutureDate(value);
             case "from_date": return validateFromDate(value);
@@ -230,79 +264,108 @@ export default function Registration() {
         return `${companyPart}/${namePart}/${mobilePart}`;
     };
 
-const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    const newErrors = {};
+        const newErrors = {};
 
-    Object.keys(formData).forEach((key) => {
-        const err = validateField(key, formData[key]);
-        if (err) newErrors[key] = err;
-    });
+        Object.keys(formData).forEach((key) => {
 
-    setErrors(newErrors);
+            // Direct registration me enquiry_received_from optional hai
+            if (key === "enquiry_received_from") return;
 
-    if (Object.keys(newErrors).length > 0) return;
+            const err = validateField(key, formData[key]);
 
-    setLoading(true);
+            if (err) {
+                newErrors[key] = err;
+                console.log("❌ Validation Error:", key, "=>", err);
+            }
+        });
 
-    try {
+        console.log("🔴 ALL VALIDATION ERRORS:", newErrors);
 
-        // ✅ Check member id
-        const exists = await checkMemberIdExists(formData.member_id);
+        setErrors(newErrors);
 
-        if (exists) {
-
-            SweetAlert.error("Member ID already exists ❌");
-
+        if (Object.keys(newErrors).length > 0) {
+            console.log("⛔ SUBMIT STOPPED DUE TO VALIDATION");
             setLoading(false);
             return;
         }
 
-        // ✅ Save client
-        const form = new FormData();
+        console.log("✅ VALIDATION PASSED");
 
-        Object.keys(formData).forEach(key => {
-            form.append(key, formData[key]);
-        });
+        setLoading(true);
 
-        await addClient(form);
+        try {
 
-        // ✅ SHOW SUCCESS MESSAGE
-        SweetAlert.success("Client Registration Added Successfully ✅");
+            // ✅ Check member id
+            const exists = await checkMemberIdExists(formData.member_id);
 
-        // ✅ Optional: Reset form
-        setFormData({
-            client_name: "",
-            member_id: "",
-            mobile: "",
-            email: "",
-            address: "",
-            category_id: "",
-            from_date: "",
-            to_date: "",
-            dob: "",
-            amount: "",
-            description: ""
-        });
+            if (exists) {
 
-        // ✅ Optional: redirect
-        // navigate("/client-list");
+                SweetAlert.error("Member ID already exists ❌");
 
-    } catch (error) {
+                setLoading(false);
+                return;
+            }
 
-        console.error("❌ Registration Error:", error);
+            // ✅ Save client
+            const form = new FormData();
 
-        SweetAlert.error("Failed to add client registration ❌");
+            Object.keys(formData).forEach((key) => {
+                let value = formData[key];
 
-    } finally {
+                if (
+                    key === "amount" ||
+                    key === "discount" ||
+                    key === "discount_price"
+                ) {
+                    value = value === "" ? 0 : Number(value);
+                }
 
-        setLoading(false);
+                form.append(key, value);
+            });
 
+            await addClient(form);
+
+            // ✅ SHOW SUCCESS MESSAGE
+            SweetAlert.success("Client Registration Added Successfully ✅");
+
+            // ✅ Reset complete form
+            setFormData({
+                enquiry_id: "",
+                reg_date: "",
+                client_name: "",
+                member_id: "",
+                address: "",
+                mobile: "",
+                category_id: "",
+                from_date: "",
+                to_date: "",
+                duration: "",
+                dob: "",
+                sessions: "",
+                email: "",
+                amount: "",
+                discount: "",
+                discount_price: "",
+                description: "",
+                enquiry_received_from: "",
+                photo: null
+            });
+
+            // ✅ Clear validation errors
+            setErrors({});
+
+        } catch (error) {
+            console.error("❌ Registration Error:", error);
+            SweetAlert.error("Failed to add client registration ❌");
+        } finally {
+            setLoading(false);
+        }
     }
 
-};
 
 
     return (
@@ -315,18 +378,23 @@ const handleSubmit = async (e) => {
                 {/* Page Content */}
                 <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                     <h2 className="text-2xl font-semibold mb-4">Client Registration</h2>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <form
+                        onSubmit={(e) => {
+                            console.log("🔥 FORM SUBMIT EVENT");
+                            handleSubmit(e);
+                        }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                    >
 
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="Reg. Date"
-                                    type="date"
                                     name="reg_date"
                                     value={formData.reg_date}
                                     onChange={handleChange}
-                                    placeholder='Enter Reg. Date'
+                                    placeholder="dd/MM/yyyy"
                                     required
                                     error={errors.reg_date}
                                 />
@@ -424,13 +492,13 @@ const handleSubmit = async (e) => {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="From Date"
-                                    type="date"
+                                    
                                     name="from_date"
                                     value={formData.from_date}
                                     onChange={handleChange}
-                                    placeholder='From Date'
+                                    placeholder="dd/MM/yyy"
                                     required
                                     error={errors.from_date}
                                 />
@@ -458,15 +526,15 @@ const handleSubmit = async (e) => {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="To Date"
-                                    type="date"
                                     name="to_date"
                                     value={formData.to_date}
                                     onChange={handleChange}
-                                    placeholder='To Date'
+                                    placeholder="dd/MM/yyy"
                                     required
                                     disabled
+                                    className='cursor-not-allowed'
                                 />
                             </div>
                         </div>
@@ -477,9 +545,8 @@ const handleSubmit = async (e) => {
                         <div>
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="Date of Birth"
-                                    type="date"
                                     name="dob"
                                     value={formData.dob}
                                     onChange={handleChange}
@@ -585,8 +652,9 @@ const handleSubmit = async (e) => {
                                     label="Enquiry Received From"
                                     name="enquiry_received_from"
                                     value={formData.enquiry_received_from}
-                                    disabled
-                                    className="cursor-not-allowed"
+                                    onChange={handleChange}
+
+
                                 />
                             </div>
                         </div>
@@ -639,19 +707,19 @@ const handleSubmit = async (e) => {
                                     typeof formData.photo === "string" ? (
 
                                         // existing image from server
-                                          <img
-                   src={`${UPLOAD_URL}/${formData.photo}`}
-                    alt="client"
-                    className="w-full h-full object-cover"
-                />
+                                        <img
+                                            src={`${UPLOAD_URL}/${formData.photo}`}
+                                            alt="client"
+                                            className="w-full h-full object-cover"
+                                        />
 
-            ) : (
+                                    ) : (
 
-                <img
-                    src={URL.createObjectURL(formData.photo)}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                />
+                                        <img
+                                            src={URL.createObjectURL(formData.photo)}
+                                            alt="preview"
+                                            className="w-full h-full object-cover"
+                                        />
                                     )
 
                                 ) : (
@@ -677,7 +745,7 @@ const handleSubmit = async (e) => {
 
                         {/* Submit Button */}
                         <div className={`md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-6 `}>
-                            <Button type="submit" variant="success" disabled={loading}>
+                            <Button className='text-white' type="submit" variant="success" disabled={loading}>
                                 {loading ? "Loading..." : "Submit Registration"}
                             </Button>
 

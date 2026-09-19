@@ -201,7 +201,7 @@ export default function Profile() {
 
               <button
                 onClick={handleSave}
-                className="w-full bg-[#1e4543] text-white py-3 rounded-xl hover:bg-[#163332] transition"
+                className="w-full bg-black text-white py-3 rounded-xl hover:bg-[#163332] transition"
               >
                 Save Profile
               </button>

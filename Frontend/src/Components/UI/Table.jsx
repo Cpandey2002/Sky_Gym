@@ -4,7 +4,18 @@ import { Search } from "lucide-react";
 import Button from "./Button";
 import Loader from "../Loader/Loader";
 
-export default function Table({ tableTitle, columns, data, loading, showExport = true, headerActions = null, headerFilters = null }) {
+export default function Table({
+  tableTitle,
+  columns,
+  data,
+  loading,
+  showSearch = true,
+  showExport = true,
+  hideHeaderGap = false,
+  headerActions = null,
+  headerFilters = null,
+  exportFileName = "Clients_Table.csv"
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -212,19 +223,19 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
     <div className="relative border border-gray-200 rounded-lg overflow-hidden shadow-sm">
 
       {/* 🔹 Sticky Header: Title + Search */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div
-          className="
-      grid grid-cols-1 gap-4 px-4 py-6
-
-      /* TABLET (md) */
-      md:grid-cols-1
-
-      /* DESKTOP (lg) */
-      lg:grid-cols-[auto_1fr_auto]
-      lg:items-center
-    "
-        >
+      <div
+  className={`sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm gap-5 ${
+    hideHeaderGap ? "mb-0" : "mb-5"
+  }`}
+>
+       <div
+  className={`grid grid-cols-1 ${
+    hideHeaderGap ? "p-0" : "p-4"
+  }
+  md:grid-cols-1
+  lg:grid-cols-[auto_1fr_auto]
+  lg:items-center`}
+>
           {/* ================= ROW 1 ================= */}
           <div
             className="
@@ -238,8 +249,8 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
       "
           >
             {/* TITLE */}
-            <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap">
-              {tableTitle}
+            <h1 >
+              { }
             </h1>
 
             {/* ================= FILTERS ================= */}
@@ -258,58 +269,53 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
             )}
 
             {/* STATUS BUTTONS */}
-            {headerActions && (
-              <div
-                className="
-            flex flex-wrap gap-3
 
-            /* Tablet: same row as title */
-            md:flex
-
-            /* Desktop: center column */
-             justify-center
-          "
-              >
-                {headerActions}
-              </div>
-            )}
           </div>
 
           {/* ================= ROW 2 ================= */}
-          <div
-            className="
-        flex flex-col gap-3
 
-        /* Tablet */
-        md:flex-row md:justify-end
+          {/* ================= ROW 2 ================= */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 w-full">
 
-        /* Desktop */
-        lg:flex-row lg:justify-end
-      "
-          >
-            {showExport && (
-              <Button
-                variant="success"
-                onClick={() => exportTableToCSV("Clients_Table.csv")}
-                className="px-6 py-2 text-sm whitespace-nowrap"
-              >
-                Export CSV
-              </Button>
-            )}
+            {/* Left side - Search + Export CSV */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
 
-            <div className="w-full md:w-72 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="pl-10 text-sm"
-              />
+              {/* Search */}
+              {showSearch && (
+                <div className="w-full sm:w-64 md:w-72 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+
+                  <Input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="pl-10 text-sm w-full"
+                  />
+                </div>
+              )}
+
+              {/* Export CSV */}
+              {showExport && (
+                <Button
+                  variant="success"
+                  onClick={() => exportTableToCSV(exportFileName)}
+                  className="px-6 py-2 text-sm whitespace-nowrap text-white w-full sm:w-auto"
+                >
+                  Export CSV
+                </Button>
+              )}
+
             </div>
+
+            {/* Right side - Add Enquiry */}
+            <div className="w-full md:w-auto flex justify-start md:justify-end">
+              {headerActions}
+            </div>
+
           </div>
         </div>
 
@@ -319,7 +325,7 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
       <div className="overflow-x-auto overflow-y-auto max-h-[60vh]">
         <table className="min-w-full border-collapse divide-y divide-gray-200">
 
-          <thead className="bg-[#1e4543] sticky top-[0rem] z-10">
+          <thead className="bg-black sticky top-[0rem] z-10">
             <tr>
               {columns.map((column, index) => (
                 <th
@@ -361,7 +367,7 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="text-center py-6 text-gray-500 text-sm"
+                  className="text-center py-6 text-gray-500 text-sm h-80"
                 >
                   No data available
                 </td>
@@ -404,7 +410,7 @@ export default function Table({ tableTitle, columns, data, loading, showExport =
           </button>
         </div>
       )}
-
     </div>
+
   );
 }

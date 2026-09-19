@@ -17,6 +17,7 @@ import {
     validateAmount,
     validateSessions
 } from "../utils/validators";
+import DateField from '../Components/UI/DateField';
 
 
 export default function RenewClient() {
@@ -28,18 +29,20 @@ export default function RenewClient() {
     const [client, setClient] = useState(null);
     const [renewData, setRenewData] = useState([]);
 
-    const [formData, setFormData] = useState({
-        id: "",
-        category_id: "",
-        client_name: "",   // ✅ THIS WAS MISSING (MAIN BUG)
-        from_date: "",
-        to_date: "",
-        duration: "",
-        discount: "",
-        discount_price: "",
-        sessions: "",
-        amount: "",
-    });
+   const [formData, setFormData] = useState({
+    id: "",
+    member_id: "",
+    category_id: "",
+    client_name: "",
+    mobile: "",
+    from_date: "",
+    to_date: "",
+    duration: "",
+    discount: "",
+    discount_price: "",
+    sessions: "",
+    amount: "",
+});
 
 
     // ✅ Auto calculate To Date
@@ -207,14 +210,15 @@ export default function RenewClient() {
                 : "";
 
             setFormData((prev) => ({
-                ...prev,
-                member_id: client.member_id || "",
-                category_id: client.category_id || "",
-                client_name: client.client_name || "", // ✅ HERE
-                mobile: client.mobile || "",
-                from_date: newFromDate,
-                duration: "",
-                to_date: "",
+    ...prev,
+    member_id: client?.member_id ?? "",
+    category_id: client?.category_id ?? "",
+    client_name: client?.client_name ?? "",
+    mobile: client?.mobile ?? "",
+    from_date: newFromDate ?? "",
+    duration: "",
+    to_date: "",
+
             }));
         }
     }, [client]);
@@ -347,9 +351,8 @@ export default function RenewClient() {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="From Date"
-                                    type="date"
                                     name="from_date"
                                     value={formData.from_date}
                                     onChange={handleChange}
@@ -381,9 +384,8 @@ export default function RenewClient() {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="To Date (Auto set)"
-                                    type="date"
                                     name="to_date"
                                     value={formData.to_date}
                                     onChange={handleChange}

@@ -22,6 +22,7 @@ import {
     validateDescription
 } from "../utils/validators";
 import { UPLOAD_URL } from "../API/config";
+import DateField from '../Components/UI/DateField';
 
 
 export default function UpdateClient() {
@@ -273,8 +274,8 @@ export default function UpdateClient() {
 
 // };
 
-const handleSubmit = async (e) => {
 
+const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {
@@ -289,50 +290,55 @@ const handleSubmit = async (e) => {
 
     setErrors(newErrors);
 
-    if (Object.values(newErrors).some(err => err !== "")) return;
+const hasErrors = Object.values(newErrors).some((err) => Boolean(err));
+
+if (hasErrors) {
+    console.log("❌ Update validation failed:", newErrors);
+    return;
+}
+
+console.log("✅ Update validation passed");
 
     try {
-
         setLoading(true);
 
         const form = new FormData();
 
-        Object.keys(formData).forEach(key => {
-
+        Object.keys(formData).forEach((key) => {
             if (key === "photo") {
-
                 if (formData.photo instanceof File) {
                     form.append("photo", formData.photo);
                 }
-
             } else {
-
-                form.append(key, formData[key]);
-
+                form.append(
+                    key,
+                    formData[key] ?? ""
+                );
             }
-
         });
+
+        console.log("📤 Updating client:", formData.id);
 
         await updateClient(formData.id, form);
 
-        SweetAlert.success("Client Updated Successfully ");
+        SweetAlert.success("Client Updated Successfully ✅");
 
-        //  GO BACK TO PREVIOUS PAGE
         navigate(-1);
 
     } catch (error) {
+        console.error("❌ Update Error:", error);
+        console.error("❌ Response:", error.response?.data);
 
-        console.error(" Update Error:", error);
-
-        SweetAlert.error("Failed to update client ");
-
+        SweetAlert.error(
+            error.response?.data?.message ||
+            "Failed to update client ❌"
+        );
     } finally {
-
         setLoading(false);
-
     }
-
 };
+
+
 
 
     return (
@@ -343,16 +349,15 @@ const handleSubmit = async (e) => {
                 <Topbar />
 
                 {/* Page Content */}
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-6 rounded-lg shadow-md mb-3">
                     <h2 className="text-2xl font-semibold mb-4">Client Details Update</h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="Reg. Date"
-                                    type="date"
                                     name="reg_date"
                                     value={formData.reg_date}
                                     onChange={handleChange}
@@ -452,9 +457,8 @@ const handleSubmit = async (e) => {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="From Date"
-                                    type="date"
                                     name="from_date"
                                     value={formData.from_date}
                                     onChange={handleChange}
@@ -486,9 +490,8 @@ const handleSubmit = async (e) => {
                         <div >
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="To Date (Auto Calculated)"
-                                    type="date"
                                     name="to_date"
                                     value={formData.to_date}
                                     onChange={handleChange}
@@ -505,9 +508,8 @@ const handleSubmit = async (e) => {
                         <div>
                             <div className='relative'>
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="Date of Birth"
-                                    type="date"
                                     name="dob"
                                     value={formData.dob}
                                     onChange={handleChange}
@@ -644,7 +646,7 @@ const handleSubmit = async (e) => {
 
 
                         {/* Submit Button */}
-                        <div className={`md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-6 `}>
+                        <div className={`md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-2 `}>
                             <Button type="submit" variant="success" disabled={loading}>
                                 {loading ? "Updating..." : "Update"}
                             </Button>

@@ -39,25 +39,31 @@ export default function Register() {
 
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    e.preventDefault();
+  console.log("1. SUBMIT CLICKED");
+  console.log("2. FORM DATA:", formData);
 
-    try {
+  try {
+    const response = await axiosInstance.post(
+      "/users/register",
+      formData
+    );
 
-      await axiosInstance.post("/users/register", formData);
+    console.log("3. REGISTER RESPONSE:", response.data);
 
-      alert("Registration Success");
+    alert("Registration Success");
+    navigate("/");
+  } catch (error) {
+    console.error(
+      "4. REGISTER ERROR:",
+      error.response?.data || error.message
+    );
 
-      navigate("/");
-
-    } catch {
-
-      alert("Registration Failed");
-
-    }
-
-  };
+    alert("Registration Failed");
+  }
+};
 
   return (
 
@@ -167,12 +173,12 @@ export default function Register() {
 
 
           <div className="col-span-2">
-            <button
-              type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-xl"
-            >
-              Register
-            </button>
+       <button
+  type="submit"
+  className="w-full bg-green-600 text-white py-3 rounded-xl"
+>
+  Register
+</button>
           </div>
 
         </form>

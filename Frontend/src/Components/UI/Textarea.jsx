@@ -26,8 +26,8 @@ const Textarea = ({
         rows={rows}
         required={required}
         placeholder={placeholder}
-        className="w-full mt-2 px-4 py-3 rounded-lg border border-gray-300 
-                  focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+        className="w-full mt-2 px-4 py-2 h-10 rounded-lg border border-gray-300 
+                  focus:ring-2 focus:ring-black focus:outline-none resize-none"
       ></textarea>
     </div>
   );

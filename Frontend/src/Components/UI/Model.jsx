@@ -9,13 +9,13 @@ const Modal = ({ isOpen, onClose, title, isForm = true, children }) => {
       <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col animate-fadeIn">
 
         {/* 🌟 Header */}
-        <div className="sticky top-0 z-10 bg-[#1e4543] text-white rounded-t-lg px-6 py-4 flex items-center justify-between shadow-md">
+        <div className="sticky top-0 z-10 bg-black text-white rounded-t-lg px-6 py-4 flex items-center justify-between shadow-md">
           <h2 className="text-lg sm:text-xl font-semibold tracking-wide">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="text-black bg-[#e8e0e0] hover:bg-gray-400 w-9 h-9 rounded-full flex items-center justify-center font-bold text-lg transition-all"
+            className="text-black bg-[#e8e0e0] hover:bg-gray-400 w-7 h-7 rounded-full flex items-center justify-center font-bold text-[12px] transition-all"
           >
             ✕
           </button>

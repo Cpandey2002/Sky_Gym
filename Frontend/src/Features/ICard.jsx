@@ -414,7 +414,7 @@ export default function Icard() {
                     title="Clients List"
                 />
 
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md mb-6">
 
                     <Table
                         tableTitle="ICard Details"
@@ -459,7 +459,10 @@ export default function Icard() {
                             ),
                             photo: (
                                 <div className="flex justify-center">
-                                    <ClientPhoto memberId={client.member_id} />
+                                    <ClientPhoto
+                                        memberId={client.member_id}
+                                        clientName={client.client_name}
+                                    />
                                 </div>
                             ),
 
@@ -472,24 +475,11 @@ export default function Icard() {
                                     onUpdate={() => handleUpdate(client)}
                                 />
                             ),
-                            // action: (
-                            //     <ActionButtons
-                            //         showRenew={true}
-                            //         onRenew={() => handleRenew(client)}
-                            //     />
-                            // ),
-
-                            action1: (
-                                <ActionButtons
-                                    showUpdate={true}
-                                    onUpdate={() => handleUpdate(client)}
-                                />
-                            ),
 
                             icard: (
                                 <button
                                     onClick={() => handleICard(client)}
-                                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm"
+                                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm "
                                 >
                                     I-Card
                                 </button>
@@ -640,7 +630,7 @@ export default function Icard() {
                                     {selectedClient.client_name}
                                 </h2> */}
 
-                             {/* Name & Member ID */}
+                            {/* Name & Member ID */}
                             <div className="mt-5 text-center text-white">
                                 <h2 className="text-[18px] font-semibold">
                                     {selectedClient.client_name}

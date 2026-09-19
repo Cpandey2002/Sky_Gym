@@ -2,7 +2,10 @@ import axiosInstance from "../API/axiosInstance";
 
 export const getEnquiryAll = async () => {
   const res = await axiosInstance.get("/enquiry");
-  return res.data;
+
+  return Array.isArray(res.data?.[0])
+    ? res.data[0]
+    : res.data;
 };
 
 export const addEnquiry = async (enquiryData) => {

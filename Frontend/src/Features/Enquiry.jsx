@@ -18,11 +18,12 @@ import {
 } from "../utils/validators";
 import { useNavigate } from "react-router-dom";
 import { getAllClients } from '../API/Client';   // ✅ ADD THIS LINE
+import DateField from '../Components/UI/DateField';
 
 
 
 export default function Enquiry() {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         client_name: "",
@@ -45,10 +46,10 @@ export default function Enquiry() {
         { header: "Enquiry Receved from", accessor: "enquiry_received_from" },
         { header: "Address", accessor: "address" },
         { header: "Enquiry Date", accessor: "enquiry_date" },
-          {
-    header: "Action",
-    accessor: "action"
-  }
+        {
+            header: "Action",
+            accessor: "action"
+        }
     ];
 
     const handleChange = (e) => {
@@ -167,84 +168,90 @@ export default function Enquiry() {
         fetchEnquiries();
     }, []);
 
-const fetchEnquiries = async () => {
+    const fetchEnquiries = async () => {
+        setTableLoading(true);
 
-    setTableLoading(true);
+        try {
+            const enquiryResponse = await getEnquiryAll();
 
-    try {
+            let registeredMobiles = [];
 
-        const enquiryResponse = await getEnquiryAll();
+            try {
+                const clientResponse = await getAllClients();
 
-        const clientResponse = await getAllClients();
+                registeredMobiles = clientResponse.map(
+                    (client) => String(client.mobile)
+                );
+            } catch (clientError) {
+                console.error("Client fetch error:", clientError);
+                // Clients fetch fail hone par bhi enquiry list dikhegi
+            }
 
-        // ✅ match using mobile number
-        const registeredMobiles = clientResponse.map(
-            client => client.mobile
-        );
+            const formattedData = enquiryResponse.map((item, index) => {
+                const isRegistered = registeredMobiles.includes(
+                    String(item.mobile)
+                );
 
-        const formattedData = enquiryResponse.map((item, index) => {
+                return {
+                    sr: index + 1,
 
-            const isRegistered =
-                registeredMobiles.includes(item.mobile);
+                    client_name: (
+                        <span
+                            className={
+                                isRegistered
+                                    ? "text-green-600 font-semibold"
+                                    : ""
+                            }
+                        >
+                            {capitalizeText(item.client_name)}
+                        </span>
+                    ),
 
-            return {
+                    mobile: item.mobile,
 
-                sr: index + 1,
+                    email: item.email,
 
-                client_name: (
-                    <span className={
-                        isRegistered
-                            ? "text-green-600 font-semibold"
-                            : ""
-                    }>
-                        {capitalizeText(item.client_name)}
-                    </span>
-                ),
+                    enquiry_received_from:
+                        item.enquiry_received_from,
 
-                mobile: item.mobile,
+                    address: capitalizeText(item.address),
 
-                email: item.email,
+                    enquiry_date: formatDate(item.enquiry_date),
 
-                enquiry_received_from: item.enquiry_received_from,
+                    action: (
+                        <Button
+                            variant={
+                                isRegistered
+                                    ? "secondary"
+                                    : "success"
+                            }
+                            size="sm"
+                            disabled={isRegistered}
+                            onClick={() =>
+                                navigate("/registration", {
+                                    state: {
+                                        enquiry: item
+                                    }
+                                })
+                            }
+                        >
+                            {isRegistered
+                                ? "Registered"
+                                : "Register"}
+                        </Button>
+                    )
+                };
+            });
 
-                address: capitalizeText(item.address),
+            setEnquiryData(formattedData);
 
-                enquiry_date: formatDate(item.enquiry_date),
-
-                action: (
-                    <Button
-                        variant={isRegistered ? "secondary" : "success"}
-                        size="sm"
-                        disabled={isRegistered}
-                        onClick={() =>
-                            navigate("/registration", {
-                                state: { enquiry: item }
-                            })
-                        }
-                    >
-                        {isRegistered
-                            ? "Registered"
-                            : "Register"}
-                    </Button>
-                )
-
-            };
-
-        });
-
-        setEnquiryData(formattedData);
-
-    } catch (error) {
-
-        console.error("Fetch error:", error);
-
-    } finally {
-
-        setTableLoading(false);
-
-    }
-
-};
+        } catch (error) {
+            console.error("Fetch enquiry error:", error);
+            SweetAlert.error("Failed to load enquiries ❌");
+        } finally {
+            setTableLoading(false);
+        }
+    };
 
 
 
@@ -252,15 +259,13 @@ const fetchEnquiries = async () => {
         <div className="flex">
             <Sidebar />
 
-            <div className="flex-1 xl:ml-[17rem] pt-20 overflow-x-auto">
+            <div className="flex-1 xl:ml-[17rem] pt-15 overflow-x-auto">
                 <Topbar />
 
                 {/* Page Content */}
 
-                <div className="flex justify-end p-4 mx-6">
-                    <Button type="button" variant="success" onClick={() => setShowModal(true)}>
-                        Add Enquiry
-                    </Button>
+                <div className="flex justify-end mx-6">
+
                     <Modal isOpen={showModal} onClose={() => { setShowModal(false); setErrors({}); }} title="Enquiry Form">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -327,11 +332,10 @@ const fetchEnquiries = async () => {
                             {/* Enquiry Date */}
                             <div className="relative">
                                 <CalendarDays className="absolute left-3 top-11 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <Input
+                                <DateField
                                     label="Enquiry Date"
-                                    type="date"
                                     name="enquiry_date"
-                                    placeholder="Enter Enquiry Date"
+                                    placeholder="dd/MM/yyyy"
                                     value={formData.enquiry_date}
                                     onChange={handleChange}
                                     required
@@ -376,13 +380,22 @@ const fetchEnquiries = async () => {
 
 
 
-                <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="bg-white p-6 rounded-lg shadow-md ">
 
                     <Table
-                        tableTitle="Enquiry List"
                         columns={columns}
                         data={enquiryData}
                         loading={tableLoading}
+                        headerActions={
+                            <Button
+                                type="button"
+                                variant="success"
+                                onClick={() => setShowModal(true)}
+                                className="px-6 py-2 text-sm whitespace-nowrap relative text-white"
+                            >
+                                Add Enquiry
+                            </Button>
+                        }
                     />
 
                 </div>

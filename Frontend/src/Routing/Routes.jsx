@@ -15,11 +15,13 @@ import AttendanceReport from "../Pages/AttendanceReport";
 import Icard from "../Features/ICard";
 import Register from "../Pages/Register";
 import Profile from "../Pages/Profile";
+import CategoryMaster from "../Pages/CategoryMaster";
+import Dashboard from "../Pages/Dashboard";
 
 export default function Routing() {
     return (
         <BrowserRouter>
-            <Routes> 
+            <Routes>
 
                 {/* ✅ PUBLIC ROUTE (LOGIN) */}
                 <Route
@@ -31,21 +33,30 @@ export default function Routing() {
                         </>
                     }
                 />
-<Route path="/register" element={<Register />} />
+                <Route path="/register" element={<Register />} />
 
                 {/* ✅ ALL PROTECTED ROUTES */}
                 <Route element={<ProtectedRoute />}>
+
+                    <Route
+                        path="/dashboard"
+                        element={<Dashboard />}
+                    />
 
                     <Route path="/enquiry" element={<Enquiry />} />
                     <Route path="/registration" element={<Registration />} />
                     <Route path="/clientdetails" element={<ClientDetails />} />
                     <Route path="/birthdaylist" element={<BirthdayList />} />
-                     <Route path="/attendance-report" element={<AttendanceReport />} />
+                    <Route path="/attendance-report" element={<AttendanceReport />} />
                     <Route path="/update-client/:id" element={<UpdateClient />} />
                     <Route path="/renew-client/:id" element={<RenewClient />} />
+                    <Route
+                        path="/category-master"
+                        element={<CategoryMaster />}
+                    />
                     <Route path="/icard" element={<Icard />} />
                     <Route path="/profile" element={<Profile />} />
-                  
+
 
 
                     {/*  */}

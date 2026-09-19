@@ -7,5 +7,8 @@ export const renewClient = async (data) => {
 
 export const getAllRenewals = async (clientId) => {
   const res = await axiosInstance.get(`/renew/client/${clientId}`);
-  return res.data;
+
+  console.log("GET RENEWALS:", res.data);
+
+  return res.data?.[0] || [];
 };

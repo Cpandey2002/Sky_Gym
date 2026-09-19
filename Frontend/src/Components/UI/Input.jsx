@@ -13,7 +13,7 @@ const Input = ({
 }) => {
     const inputClasses = `
    pl-10 w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-500
-    focus:outline-none focus:ring-1 focus:ring-[#C2FC85] focus:border-[#C2FC85]
+    focus:outline-none focus:ring-1 focus:ring-[black] focus:border-[black]
     ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}
     ${className}
   `;

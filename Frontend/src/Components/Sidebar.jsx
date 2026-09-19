@@ -7,7 +7,9 @@ import {
   Menu,
   X,
   User,
-  NotebookPen
+  NotebookPen,
+  ChevronDown,
+  LayoutDashboard,
 } from "lucide-react";
 import { NavLink, useNavigate, useMatch } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -17,6 +19,7 @@ import CompanyLogo from "../Features/CompanyLogo";
 const Sidebar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [masterOpen, setMasterOpen] = useState(false);
 
   const company_code = localStorage.getItem("company_code") || "";
   const company_name = localStorage.getItem("company_name") || "";
@@ -28,12 +31,27 @@ const Sidebar = () => {
   const matchRenewClient = useMatch("/renew-client/:id");
 
   const menuItems = [
+    {
+  text: "Dashboard",
+  path: "/dashboard",
+  icon: <LayoutDashboard size={20} />
+},
     { icon: <ShieldAlert size={20} />, text: "Enquiry", path: "/enquiry" },
     { icon: <ReceiptText size={20} />, text: "Registration", path: "/registration" },
     { icon: <BookUser size={20} />, text: "Client Details", path: "/clientdetails" },
     { icon: <BookUser size={20} />, text: "Icard", path: "/icard" },
     {
       icon: <NotebookPen size={20} />, text: "Attendance Report", path: "/attendance-report",
+    },
+    {
+      icon: <NotebookPen size={20} />,
+      text: "Master",
+      submenu: [
+        {
+          text: "Category Master",
+          path: "/category-master"
+        }
+      ]
     },
     { icon: <Cake size={20} />, text: "Birthday", path: "/birthdaylist" },
   ];
@@ -58,7 +76,7 @@ const Sidebar = () => {
 
       {/* Mobile Toggle */}
       <button
-        className="fixed top-2 right-4 z-70 p-1 bg-[#1e4543] rounded-lg text-white shadow-sm xl:hidden"
+        className="fixed top-2 right-4 z-70 p-1 bg-black rounded-lg text-white shadow-sm xl:hidden"
         onClick={toggleSidebar}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -77,7 +95,7 @@ const Sidebar = () => {
       <aside
         className={`
     fixed inset-y-0 flex flex-col w-full max-w-[17rem] p-0 overflow-y-auto
-    border-r border-[#434444] shadow-lg z-999 bg-[#1e4543]
+    border-r border-[#434444] shadow-lg z-999 bg-black
     sidebar-slide
     ${isOpen ? "left-0" : "-left-full"} 
     xl:left-0
@@ -85,34 +103,22 @@ const Sidebar = () => {
       >
 
         {/* Header */}
-        <div className="p-5 border-b border-[#1e4543]">
-          <div className="flex items-center">
-            <div className="ml-3">
-              {/* Header */}
-              {/* Header */}
 
-              {company_code ? (
-                <CompanyLogo
-                  companyCode={company_code}
-                  className="h-14 mx-auto"
-                  fallback={
-                    <p className="text-2xl text-center text-[#C2FC85] uppercase font-semibold">
-                      {company_code}
-                    </p>
-                  }
-                />
-              ) : (
-                <p className="text-2xl text-center text-[#C2FC85] uppercase font-semibold">
-                  {company_code}
-                </p>
-              )}
-
-              {/* <p className="text-2xl text-center text-[#C2FC85] uppercase font-semibold">
-                {company_code}
-              </p> */}
-
-            </div>
+        <div className="flex items-center px-3 py-2 rounded-lg hover:bg-[#434444] ml-[10px] mb-[8px] mt-[20px]">
+          <div className="w-10 h-10 bg-[#434444] rounded-full flex items-center justify-center">
+            <User className="text-[#C2FC85]" size={18} />
           </div>
+
+          <div className="ml-2">
+            <p className="font-medium text-white capitalize">
+              {company_code}
+            </p>
+
+            <p className="text-sm text-white capitalize">
+              {company_name}
+            </p>
+          </div>
+
         </div>
 
         {/* Navigation */}
@@ -120,48 +126,99 @@ const Sidebar = () => {
           <ul className="space-y-1 px-3">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <NavLink
-                  to={item.path}
-                  onClick={handleRouteClick}
-                  className={({ isActive }) => {
-                    const finalActive =
-                      isActive ||
-                      (item.path === "/clientdetails" &&
-                        (matchUpdateClient || matchRenewClient));
 
-                    {/* Menu Item */ }
-                    return `flex items-center px-4 py-3 rounded-xl transition-all duration-200 group
-${finalActive
-                        ? "bg-[#C2FC85] text-[#434444] font-semibold"
-                        : "text-white hover:bg-[#C2FC85] hover:text-[#434444]"
-                      }`;
+                {item.submenu ? (
+                  <>
+                    {/* Master */}
+                    <button
+                      onClick={() => setMasterOpen(!masterOpen)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group text-white hover:bg-[#C2FC85] hover:text-[#434444]"
+                    >
+                      <div className="flex items-center">
+                        <div className="bg-[#434444] w-9 h-9 rounded-xl flex items-center justify-center shadow-sm">
+                          <div className="text-[#C2FC85]">
+                            {item.icon}
+                          </div>
+                        </div>
 
-                  }}
-                >
-                  {/* Icon Box */}
-                  <div className="bg-[#434444] w-9 h-9 rounded-xl flex items-center justify-center shadow-sm">
-                    <div className="text-[#C2FC85]">{item.icon}</div>
-                  </div>
+                        <span className="ml-3 font-medium group-hover:font-semibold">
+                          {item.text}
+                        </span>
+                      </div>
 
+                      <ChevronDown
+                        size={18}
+                        className={`transition-transform duration-200 ${masterOpen ? "rotate-180" : ""
+                          }`}
+                      />
+                    </button>
 
-                  <span className="ml-3 font-medium group-hover:font-semibold">
-                    {item.text}
-                  </span>
-                </NavLink>
+                    {/* Submenu */}
+                    {masterOpen && (
+                      <ul className="ml-10 mt-1 space-y-1">
+                        {item.submenu.map((subItem, subIndex) => (
+                          <li key={subIndex}>
+                            <NavLink
+                              to={subItem.path}
+                              onClick={handleRouteClick}
+                              className={({ isActive }) =>
+                                `block px-4 py-2 rounded-lg text-base transition-all duration-200 ${isActive
+                                  ? "bg-[#C2FC85] text-[#434444] font-semibold"
+                                  : "text-white hover:bg-[#C2FC85] hover:text-[#434444]"
+                                }`
+                              }
+                            >
+                              {subItem.text}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  /* Normal Menu */
+                  <NavLink
+                    to={item.path}
+                    onClick={handleRouteClick}
+                    className={({ isActive }) => {
+                      const finalActive =
+                        isActive ||
+                        (item.path === "/clientdetails" &&
+                          (matchUpdateClient || matchRenewClient));
+
+                      return `flex items-center px-4 py-2 rounded-xl transition-all duration-200 group
+          ${finalActive
+                          ? "bg-[#C2FC85] text-[#434444] font-semibold"
+                          : "text-white hover:bg-[#C2FC85] hover:text-[#434444]"
+                        }`;
+                    }}
+                  >
+                    <div className="bg-[#434444] w-9 h-9 rounded-xl flex items-center justify-center shadow-sm">
+                      <div className="text-[#C2FC85]">
+                        {item.icon}
+                      </div>
+                    </div>
+
+                    <span className="ml-3 font-medium group-hover:font-semibold">
+                      {item.text}
+                    </span>
+                  </NavLink>
+                )}
+
               </li>
             ))}
           </ul>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#1e4543]">
-          <div className="flex items-center px-3 py-2 rounded-lg hover:bg-[#434444]">
+        <div className="p-4 border-t border-black">
+          {/* <div className="flex items-center px-3 py-2 rounded-lg hover:bg-[#434444]">
             <div className="w-10 h-10 bg-[#434444] rounded-full flex items-center justify-center">
               <User className="text-[#C2FC85]" size={18} />
             </div>
 
             <div className="ml-2">
-              <p className="font-medium text-[#C2FC85] capitalize">
+              <p className="font-medium text-white capitalize">
                 {company_code}
               </p>
 
@@ -170,10 +227,10 @@ ${finalActive
               </p>
             </div>
 
-          </div>
+          </div> */}
 
 
-          <div className="mt-8 mx-3">
+          <div className="mt-2 mx-3">
             <button
               onClick={handleLogout}
               className="cursor-pointer w-full py-2.5 bg-[#C2FC85]

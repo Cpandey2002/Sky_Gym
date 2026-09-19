@@ -32,21 +32,21 @@ export default function Table2({
         <table className="min-w-full border-collapse divide-y divide-gray-200">
 
           {/* TABLE HEADER */}
-          <thead className="bg-[#1e4543] sticky top-[0rem] z-10">
-
+          <thead className="bg-black">
             <tr>
 
               {columns.map((col, index) => (
 
                 <th
-                  key={index}px-4 py-3 text-left te
-                   className="px-6 py-3 text-left text-sm font-semibold text-[#ffffff] uppercase tracking-wider whitespace-nowrap border-b border-gray-300"
-                   
+                  key={index} px-4 py-3 text-left te
+                  className="px-6 py-3 text-left text-sm font-semibold text-[#ffffff] uppercase tracking-wider whitespace-nowrap border-b border-gray-300"
+
                   style={{
-                    position: col.sticky ? "sticky" : "static",
+                    position: col.sticky ? "sticky" : "sticky",
                     left: col.sticky ? col.left : "auto",
-                    zIndex: col.sticky ? 50 : 1,
-                    background: "#1e4543"
+                    top: "0px",
+                    zIndex: col.sticky ? 50 : 40,
+                    background: "black"
                   }}
                 >
                   {col.header}
