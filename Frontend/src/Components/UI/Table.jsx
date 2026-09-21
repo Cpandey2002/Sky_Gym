@@ -17,9 +17,10 @@ export default function Table({
   exportFileName = "Clients_Table.csv"
 }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const recordsPerPage = 50;
+  const [currentPage, setCurrentPage] = useState(1);
+const [recordsPerPage, setRecordsPerPage] = useState(20);
+
 
   // ✅ Filter data by search term
   const filteredData = useMemo(() => {
@@ -34,16 +35,30 @@ export default function Table({
     );
   }, [data, searchTerm]);
 
+ 
+
+
+
   // ✅ Pagination logic
-  const totalPages = Math.ceil(filteredData?.length / recordsPerPage);
-  const startIndex = (currentPage - 1) * recordsPerPage;
-  const endIndex = startIndex + recordsPerPage;
-  const currentData = filteredData?.slice(startIndex, endIndex);
+  const totalRecords = filteredData?.length || 0;
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
+const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
+const startIndex = (currentPage - 1) * recordsPerPage;
+const endIndex = startIndex + recordsPerPage;
+
+const currentData = filteredData?.slice(startIndex, endIndex) || [];
+
+const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+    }
+};
+
+const handleRecordsPerPageChange = (e) => {
+    setRecordsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+};
 
   const exportTableToCSV = (tableType = "Client Details") => {
     if (!currentData || !currentData.length) return;
@@ -224,18 +239,16 @@ export default function Table({
 
       {/* 🔹 Sticky Header: Title + Search */}
       <div
-  className={`sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm gap-5 ${
-    hideHeaderGap ? "mb-0" : "mb-5"
-  }`}
->
-       <div
-  className={`grid grid-cols-1 ${
-    hideHeaderGap ? "p-0" : "p-4"
-  }
+        className={`sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm gap-5 ${hideHeaderGap ? "mb-0" : "mb-5"
+          }`}
+      >
+        <div
+          className={`grid grid-cols-1 ${hideHeaderGap ? "p-0" : "p-4"
+            }
   md:grid-cols-1
   lg:grid-cols-[auto_1fr_auto]
   lg:items-center`}
->
+        >
           {/* ================= ROW 1 ================= */}
           <div
             className="
@@ -338,42 +351,44 @@ export default function Table({
             </tr>
           </thead>
 
-          <tbody className="bg-white divide-y divide-gray-200">
-
-            {/* 🔥 SHOW LOADER WITHOUT BREAKING TABLE */}
+          <tbody>
             {loading ? (
               <tr>
-                <td colSpan={columns.length} className="py-10 text-center">
-                  <Loader />   {/* your hourglass loader */}
+                <td
+                  colSpan={columns.length}
+                  className="text-center py-10"
+                >
+                  Loading...
                 </td>
               </tr>
-            ) : currentData?.length > 0 ? (
+            ) : currentData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="text-center py-10 text-gray-500"
+                >
+                  No Data Found
+                </td>
+              </tr>
+            ) : (
               currentData.map((row, rowIndex) => (
                 <tr
-                  key={row.id || rowIndex}
-                  className={`${row.className || ""} hover:bg-gray-100 transition`}
+                  key={rowIndex}
+                  className="hover:bg-gray-50 transition"
                 >
-                  {columns.map((column, colIndex) => (
+                  {columns.map((col, colIndex) => (
                     <td
                       key={colIndex}
-                      className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap"
+                      className="px-4 py-2 text-sm"
                     >
-                      {row[column.accessor]}
+                      {col.cell
+                        ? col.cell(row)
+                        : row[col.accessor]}
                     </td>
                   ))}
                 </tr>
               ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="text-center py-6 text-gray-500 text-sm h-80"
-                >
-                  No data available
-                </td>
-              </tr>
             )}
-
           </tbody>
 
 
@@ -381,35 +396,70 @@ export default function Table({
       </div>
 
       {/* 🔹 Pagination */}
-      {totalPages > 1 && (
+      {totalPages > 0 && (
         <div className="flex items-center justify-between mt-3 px-4 py-2 bg-gray-50 border-t border-gray-200 sticky bottom-0">
+
+          {/* Previous */}
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === 1
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-indigo-500 text-white hover:bg-indigo-600"
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-indigo-500 text-white hover:bg-indigo-600"
               }`}
           >
             Previous
           </button>
 
-          <span className="text-sm text-gray-600">
-            Page {currentPage} of {totalPages} ({filteredData.length} records)
-          </span>
+          {/* Range Dropdown */}
+          <div className="relative">
 
+            <button
+              onClick={() => setIsPageDropdownOpen(!isPageDropdownOpen)}
+              className="px-4 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              {pageRanges[currentPage - 1]?.label} ▼
+            </button>
+
+            {isPageDropdownOpen && (
+              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-28 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
+
+                {pageRanges.map((range) => (
+                  <button
+                    key={range.page}
+                    onClick={() => {
+                      setCurrentPage(range.page);
+                      setIsPageDropdownOpen(false);
+                    }}
+                    className={`block w-full px-3 py-2 text-sm text-left hover:bg-gray-100 ${currentPage === range.page
+                        ? "bg-gray-100 font-semibold"
+                        : ""
+                      }`}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+
+              </div>
+            )}
+
+          </div>
+
+          {/* Next */}
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === totalPages
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-indigo-500 text-white hover:bg-indigo-600"
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-indigo-500 text-white hover:bg-indigo-600"
               }`}
           >
             Next
           </button>
+
         </div>
       )}
+
     </div>
 
   );

@@ -14,13 +14,37 @@ import { Pencil, Trash2 } from "lucide-react";
 import {
     getAllCategories,
     createCategory,
-    updateCategory,
-    deleteCategory,
+
 } from "../API/Category";
 
 const CategoryMaster = () => {
 
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState([
+        {
+            id: 1,
+            name: "Gym",
+            price: 1000,
+            description: "Monthly gym membership"
+        },
+        {
+            id: 2,
+            name: "Yoga",
+            price: 800,
+            description: "Yoga training"
+        },
+        {
+            id: 3,
+            name: "Karate",
+            price: 1200,
+            description: "Karate training"
+        },
+        {
+            id: 4,
+            name: "Dance",
+            price: 900,
+            description: "Dance classes"
+        }
+    ]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -76,9 +100,9 @@ const CategoryMaster = () => {
         }
     ];
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
+    // useEffect(() => {
+    //     fetchCategories();
+    // }, []);
 
     const fetchCategories = async () => {
         try {
@@ -90,6 +114,30 @@ const CategoryMaster = () => {
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
+    };
+
+    // Edit
+
+    const handleEdit = (row) => {
+        console.log("Edit Category:", row);
+
+        setFormData({
+            name: row.name,
+            price: row.price,
+            description: row.description
+        });
+
+        setShowModal(true);
+    };
+
+    // Delete
+
+    const handleDelete = (row) => {
+        console.log("Delete Category:", row);
+
+        setCategories((prev) =>
+            prev.filter((category) => category.id !== row.id)
+        );
     };
 
     const handleChange = (e) => {
@@ -230,6 +278,7 @@ const CategoryMaster = () => {
                             data={categories}
                             loading={loading}
                             showExport={false}
+                            enablePagination={true}
                             headerActions={
                                 <Button
                                     type="button"
