@@ -414,7 +414,7 @@ export default function Icard() {
                     title="Clients List"
                 />
 
-                <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md">
 
                     <Table
                         tableTitle="ICard Details"

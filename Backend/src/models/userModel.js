@@ -1,14 +1,12 @@
 import db from "../config/db.js";
 
 export const registerUser = async (userData) => {
-
   const [rows] = await db.query(
     "CALL sp_user('REGISTER', 0, ?)",
     [JSON.stringify(userData)]
   );
 
-  return rows[0];
-
+  return rows[0][0];
 };
 
 

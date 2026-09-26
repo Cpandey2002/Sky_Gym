@@ -32,10 +32,10 @@ const Sidebar = () => {
 
   const menuItems = [
     {
-  text: "Dashboard",
-  path: "/dashboard",
-  icon: <LayoutDashboard size={20} />
-},
+      text: "Dashboard",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />
+    },
     { icon: <ShieldAlert size={20} />, text: "Enquiry", path: "/enquiry" },
     { icon: <ReceiptText size={20} />, text: "Registration", path: "/registration" },
     { icon: <BookUser size={20} />, text: "Client Details", path: "/clientdetails" },
@@ -76,7 +76,7 @@ const Sidebar = () => {
 
       {/* Mobile Toggle */}
       <button
-        className="fixed top-2 right-4 z-70 p-1 bg-black rounded-lg text-white shadow-sm xl:hidden"
+        className="fixed top-2 left-4 z-70 p-1 bg-black rounded-lg text-white shadow-sm xl:hidden"
         onClick={toggleSidebar}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}

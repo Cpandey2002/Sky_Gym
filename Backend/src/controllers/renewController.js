@@ -34,15 +34,18 @@ export const getAllRenew = async (req, res) => {
 
 export const getRenewByClientId = async (req, res) => {
   try {
-    const { client_id } = req.body;
+    const { clientId } = req.params;
     const company_code = req.user.company_code;
-    const [rows] =
-      await RenewModel.findByClientId(
-        client_id,
-        company_code
-      );
+
+    const [rows] = await RenewModel.findByClientId(
+      Number(clientId),
+      company_code
+    );
+
     res.json(rows);
   } catch (error) {
+    console.error("Get Renew By Client Error:", error);
+
     res.status(500).json({
       error: "Failed to fetch renew records"
     });

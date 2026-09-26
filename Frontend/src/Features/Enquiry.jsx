@@ -380,7 +380,7 @@ export default function Enquiry() {
 
 
 
-                <div className="bg-white p-6 rounded-lg shadow-md ">
+                <div className="bg-white p-4 rounded-lg shadow-md ">
 
                     <Table
                         columns={columns}

@@ -268,7 +268,7 @@ export default function ClientDetails() {
             reg_date: formatDate(item.reg_date),
 
             status: (
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${expiryStatus.badge}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${expiryStatus.badge}`}>
                     {expiryStatus.label}
                 </span>
             ),
@@ -321,7 +321,7 @@ export default function ClientDetails() {
                     title="Clients List"
                 />
 
-                <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md">
 
                     <Table
                         tableTitle="Clients Details"
@@ -336,10 +336,9 @@ export default function ClientDetails() {
 
                             status: (() => {
                                 const expiryStatus = getExpiryStatus(client.to_date);
-
                                 return (
                                     <span
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${expiryStatus.badge}`}
+                                        className={`inline-block min-w-max px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${expiryStatus.badge}`}
                                     >
                                         {expiryStatus.label}
                                     </span>
@@ -413,10 +412,10 @@ export default function ClientDetails() {
                         loading={tableLoader}
 
                         headerActions={
-                            <div className="flex flex-nowrap items-center gap-2">
+                            <div className="grid grid-cols-2 min-[931px]:grid-cols-4 gap-2 w-full">
                                 <button
                                     onClick={() => setStatusFilter("all")}
-                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "all"
                                             ? "bg-gray-700 text-white"
                                             : "bg-gray-100 text-gray-700"}`}
@@ -426,7 +425,7 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("expired")}
-                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                                    className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "expired"
                                             ? "bg-red-600 text-white"
                                             : "bg-red-100 text-red-700"}`}
@@ -436,7 +435,7 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("expiring")}
-                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                                    className={`px-2 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "expiring"
                                             ? "bg-yellow-500 text-white"
                                             : "bg-yellow-100 text-yellow-800"}`}
@@ -446,7 +445,7 @@ export default function ClientDetails() {
 
                                 <button
                                     onClick={() => setStatusFilter("active")}
-                                    className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                                    className={`px-2 py-2 rounded-full text-sm font-medium whitespace-nowrap
           ${statusFilter === "active"
                                             ? "bg-green-600 text-white"
                                             : "bg-green-100 text-green-700"}`}

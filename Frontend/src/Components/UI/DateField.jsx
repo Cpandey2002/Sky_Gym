@@ -10,6 +10,7 @@ const DateField = ({
     required = false,
     error = "",
     placeholder = "dd/MM/yyyy",
+    disabled = false,
 }) => {
 
     const selectedDate = value
@@ -41,13 +42,14 @@ const DateField = ({
             <DatePicker
                 selected={selectedDate}
                 onChange={handleDateChange}
+                disabled={disabled}
                 dateFormat="dd/MM/yyyy"
                 placeholderText={placeholder}
-                className={`w-full pl-10 px-3 py-2 border rounded-md outline-none focus:ring-1 focus:ring-[black] focus:border-[black] ${
-                    error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full pl-10 px-3 py-2 border rounded-md outline-none focus:ring-1 focus:ring-[black] focus:border-[black] ${error ? "border-red-500" : "border-gray-300"
+                    }${disabled ? "bg-gray-100 cursor-not-allowed" : ""}
+                    `}
                 wrapperClassName="w-full"
-                
+
                 showMonthDropdown
                 showYearDropdown
                 dropdownMode="select"

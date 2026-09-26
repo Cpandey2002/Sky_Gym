@@ -287,7 +287,7 @@ export default function RenewClient() {
                 <Topbar />
 
                 {/* Page Content */}
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md">
                     <h2 className="text-2xl font-semibold mb-4">Renew Client Membership</h2>
                     <form onSubmit={handleRenew} className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -496,7 +496,7 @@ export default function RenewClient() {
                         </div>
                     </form>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-4 rounded-lg shadow-md">
                     <Table
                         tableTitle="Renewal History"
                         columns={renewalColumns}

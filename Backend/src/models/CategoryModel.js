@@ -8,6 +8,14 @@ class CategoryModel {
         );
     }
 
+    // CHANGES ADD CATEGORIES
+    static create(payload) {
+        return db.query(
+            "CALL sp_category('CREATE', 0, ?)",
+            [JSON.stringify(payload)]
+        );
+    }
+
 }
 
 export default CategoryModel;

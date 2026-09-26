@@ -30,7 +30,7 @@ const Topbar = ({ rightContent }) => {
 
     // Profile section click outside popup close
 
-     useEffect(() => {
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (!event.target.closest(".profile-menu")) {
                 setShowProfileMenu(false);
@@ -541,7 +541,7 @@ const Topbar = ({ rightContent }) => {
                             </button>
 
                             {/* LOGOUT */}
-{/* 
+                            {/* 
                             <button
                                 onClick={handleLogout}
                                 className="
@@ -650,22 +650,22 @@ const Topbar = ({ rightContent }) => {
                         </span> */}
 
                             {totalNotifications > 0 &&
-    !birthdayView &&
-    !selectedClient &&
-    openCategory !== "expired" &&
-    openCategory !== "expiring" && (
-        <span
-            className="
+                                !birthdayView &&
+                                !selectedClient &&
+                                openCategory !== "expired" &&
+                                openCategory !== "expiring" && (
+                                    <span
+                                        className="
                 bg-[#C2FC85]
                 text-[#1e4543]
                 px-2 py-1
                 rounded-full
                 text-xs
             "
-        >
-            {totalNotifications}
-        </span>
-    )}
+                                    >
+                                        {totalNotifications}
+                                    </span>
+                                )}
 
                         </div>
 
@@ -1067,7 +1067,7 @@ const Topbar = ({ rightContent }) => {
                                EXPIRING CLIENT LIST
                                ================================= */
 
-                            <div className="max-h-[350px] overflow-y-auto">
+                            <div>
 
 
                                 {/* =================================
@@ -1110,8 +1110,7 @@ const Topbar = ({ rightContent }) => {
                                 {/* =================================
     CLIENT LIST
     ================================= */}
-                                <div>
-
+                                <div className="max-h-[250px] overflow-y-auto">
                                     {expiringTab === "7days" ? (
 
                                         notifications.expiring.length === 0 ? (

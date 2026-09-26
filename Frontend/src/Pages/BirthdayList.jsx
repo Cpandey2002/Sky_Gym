@@ -146,12 +146,12 @@ export default function BirthdayList() {
             <div className="flex-1 xl:ml-[17rem]  pt-16 overflow-x-auto">
                 <Topbar />
 
-                <div className="p-6 space-y-2 flex  gap-2">
+                <div className="p-4 space-y-2 flex  gap-2">
                     <div
                         className={`bg-gradient-to-r from-[#1e4543] to-[#1e4543] 
                                         w-9 h-9  rounded-xl flex items-center justify-center shadow-sm`}
                     >
-                       <CakeSlice className="inline  text-[#C2FC85]" />
+                        <CakeSlice className="inline  text-[#C2FC85]" />
                     </div>
                     <span className="text-2xl font-semibold  text-gray-800">
                         Birthday List
@@ -160,9 +160,9 @@ export default function BirthdayList() {
 
                 {/* ---------- TABS HEADER ---------- */}
                 <div className="px-6">
-                    <div className="flex gap-4  border-b-2 border-[#e8e0e0] pb-2">
+                    <div className="flex gap-2  border-b-2 border-[#e8e0e0] pb-2">
                         <button
-                            className={`px-4 py-2 font-semibold ${activeTab === "today" ? "text-[#1e4543] border-b-2 border-[#1e4543]" : "text-gray-600"
+                            className={`px-2 py-1 font-semibold ${activeTab === "today" ? "text-[#1e4543] border-b-2 border-[#1e4543]" : "text-gray-600"
                                 }`}
                             onClick={() => setActiveTab("today")}
                         >
@@ -170,25 +170,50 @@ export default function BirthdayList() {
                         </button>
 
                         <button
-                            className={`px-4 py-2 font-semibold ${activeTab === "upcoming" ? "text-[#1e4543] border-b-2 border-[#1e4543]" : "text-gray-600"
+                            className={`px-2 py-2 font-semibold ${activeTab === "upcoming" ? "text-[#1e4543] border-b-2 border-[#1e4543]" : "text-gray-600"
                                 }`}
                             onClick={() => setActiveTab("upcoming")}
                         >
                             Upcoming
                         </button>
 
-                        <button
-                            className={`px-4 py-2 font-semibold ${activeTab === "monthwise" ? "text-[#1e4543] border-b-2 border-[#1e4543]" : "text-gray-600"
-                                }`}
-                            onClick={() => setActiveTab("monthwise")}
-                        >
-                            Month-wise
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                className={`px-2 py-2 font-semibold ${activeTab === "monthwise"
+                                        ? "text-[#1e4543] border-b-2 border-[#1e4543]"
+                                        : "text-gray-600"
+                                    }`}
+                                onClick={() => setActiveTab("monthwise")}
+                            >
+                                Month-wise
+                            </button>
+
+                            {activeTab === "monthwise" && (
+                                <select
+                                    className="appearance-none w-25 px-2 py-1
+                       bg-white
+                       border border-black rounded-xl
+                       shadow-sm text-gray-700 font-semibold
+                       focus:outline-none focus:ring-1
+                       focus:ring-black
+                       hover:border-black
+                       transition-all duration-200"
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                                >
+                                    {monthNames.map((m, i) => (
+                                        <option key={i} value={i}>
+                                            {m}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* ---------- TAB CONTENT ---------- */}
-                <div className="px-6 mt-6">
+                <div className="px-6 mt-0">
 
                     {/* TODAY */}
                     {activeTab === "today" && (
@@ -215,23 +240,6 @@ export default function BirthdayList() {
                     {/* MONTHWISE */}
                     {activeTab === "monthwise" && (
                         <div className="space-y-6">
-
-                            {/* Month Selector */}
-                            <select
-                                className=" appearance-none w-36 px-4 py-2.5
-      bg-white/80 backdrop-blur-md
-      border border-[#C2FC85] rounded-xl
-      shadow-sm text-gray-700 font-semibold
-      focus:outline-none focus:ring-4 focus:ring-[#C2FC85]/40
-      hover:border-[#C2FC85] hover:shadow-[#C2FC85]/40
-      transition-all duration-200"
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                            >
-                                {monthNames.map((m, i) => (
-                                    <option key={i} value={i}>{m}</option>
-                                ))}
-                            </select>
 
                             <Table
                                 tableTitle={`${monthNames[selectedMonth]} Birthdays`}

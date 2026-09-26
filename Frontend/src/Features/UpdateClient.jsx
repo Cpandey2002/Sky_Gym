@@ -349,7 +349,7 @@ console.log("✅ Update validation passed");
                 <Topbar />
 
                 {/* Page Content */}
-                <div className="bg-white p-6 rounded-lg shadow-md mb-3">
+                <div className="bg-white p-4 rounded-lg shadow-md">
                     <h2 className="text-2xl font-semibold mb-4">Client Details Update</h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
 

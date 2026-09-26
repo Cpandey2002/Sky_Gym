@@ -137,7 +137,7 @@ const Dashboard = () => {
             Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 w-full">
             <DashboardCard
               title="Total Clients"
               value={totalClients}
@@ -186,7 +186,7 @@ const Dashboard = () => {
 
             {/* Right - Dummy Pie Chart */}
             {/* Right - Members Overview */}
-            <div className="bg-white p-6 rounded-lg shadow-md min-w-0">
+            <div className="bg-white p-4 rounded-lg shadow-md">
 
               <h2 className="text-2xl font-semibold mb-4">
                 Members Overview

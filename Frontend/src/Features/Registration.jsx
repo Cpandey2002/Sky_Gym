@@ -376,14 +376,14 @@ export default function Registration() {
                 <Topbar />
 
                 {/* Page Content */}
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 className="text-2xl font-semibold mb-4">Client Registration</h2>
+                <div className="bg-white p-4 rounded-lg shadow-md">
+                    {/* <h2 className="text-2xl font-semibold mb-4">Client Registration</h2> */}
                     <form
                         onSubmit={(e) => {
                             console.log("🔥 FORM SUBMIT EVENT");
                             handleSubmit(e);
                         }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                        className="grid grid-cols-1 md:grid-cols-3 gap-4"
                     >
 
                         <div >
@@ -744,7 +744,7 @@ export default function Registration() {
 
 
                         {/* Submit Button */}
-                        <div className={`md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-6 `}>
+                        <div className={`md:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-1 `}>
                             <Button className='text-white' type="submit" variant="success" disabled={loading}>
                                 {loading ? "Loading..." : "Submit Registration"}
                             </Button>

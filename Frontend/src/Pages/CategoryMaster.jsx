@@ -82,10 +82,7 @@ const CategoryMaster = () => {
                 </div>
             )
         },
-        {
-            header: "ID",
-            accessor: "id"
-        },
+        
         {
             header: "Category Name",
             accessor: "name"
@@ -285,7 +282,7 @@ const CategoryMaster = () => {
                                     variant="success"
                                     onClick={() => setShowModal(true)}
                                 >
-                                    Add Category
+                                    Add
                                 </Button>
                             }
                         />

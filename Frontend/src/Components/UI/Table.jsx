@@ -19,7 +19,7 @@ export default function Table({
   const [searchTerm, setSearchTerm] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-const [recordsPerPage, setRecordsPerPage] = useState(20);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
 
 
   // ✅ Filter data by search term
@@ -35,30 +35,40 @@ const [recordsPerPage, setRecordsPerPage] = useState(20);
     );
   }, [data, searchTerm]);
 
- 
+
 
 
 
   // ✅ Pagination logic
   const totalRecords = filteredData?.length || 0;
 
-const totalPages = Math.ceil(totalRecords / recordsPerPage);
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
-const startIndex = (currentPage - 1) * recordsPerPage;
-const endIndex = startIndex + recordsPerPage;
+  const pageRanges = Array.from({ length: totalPages }, (_, index) => {
+    const start = index * recordsPerPage + 1;
+    const end = Math.min((index + 1) * recordsPerPage, filteredData.length);
 
-const currentData = filteredData?.slice(startIndex, endIndex) || [];
+    return {
+      page: index + 1,
+      label: `${start} - ${end}`,
+    };
+  });
 
-const handlePageChange = (page) => {
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+
+  const currentData = filteredData?.slice(startIndex, endIndex) || [];
+
+  const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-        setCurrentPage(page);
+      setCurrentPage(page);
     }
-};
+  };
 
-const handleRecordsPerPageChange = (e) => {
+  const handleRecordsPerPageChange = (e) => {
     setRecordsPerPage(Number(e.target.value));
     setCurrentPage(1);
-};
+  };
 
   const exportTableToCSV = (tableType = "Client Details") => {
     if (!currentData || !currentData.length) return;
@@ -239,7 +249,7 @@ const handleRecordsPerPageChange = (e) => {
 
       {/* 🔹 Sticky Header: Title + Search */}
       <div
-        className={`sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm gap-5 ${hideHeaderGap ? "mb-0" : "mb-5"
+        className={`sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm gap-5 ${hideHeaderGap ? "mb-0" : "mb-1"
           }`}
       >
         <div
@@ -285,10 +295,10 @@ const handleRecordsPerPageChange = (e) => {
 
           </div>
 
-          {/* ================= ROW 2 ================= */}
+
 
           {/* ================= ROW 2 ================= */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 w-full">
+          <div className="flex items-center justify-between gap-3 w-full">
 
             {/* Left side - Search + Export CSV */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
@@ -335,7 +345,7 @@ const handleRecordsPerPageChange = (e) => {
       </div>
 
       {/* 🔹 Scrollable Table Container */}
-      <div className="overflow-x-auto overflow-y-auto max-h-[60vh]">
+      <div className="overflow-x-auto overflow-y-auto min-h-[300px] max-h-[60vh]">
         <table className="min-w-full border-collapse divide-y divide-gray-200">
 
           <thead className="bg-black sticky top-[0rem] z-10">
@@ -397,66 +407,72 @@ const handleRecordsPerPageChange = (e) => {
 
       {/* 🔹 Pagination */}
       {totalPages > 0 && (
-        <div className="flex items-center justify-between mt-3 px-4 py-2 bg-gray-50 border-t border-gray-200 sticky bottom-0">
+        <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200">
 
-          {/* Previous */}
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-indigo-500 text-white hover:bg-indigo-600"
-              }`}
-          >
-            Previous
-          </button>
+          {/* Rows Per Page */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span>Rows:</span>
 
-          {/* Range Dropdown */}
-          <div className="relative">
-
-            <button
-              onClick={() => setIsPageDropdownOpen(!isPageDropdownOpen)}
-              className="px-4 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            <select
+              value={recordsPerPage}
+              onChange={(e) => {
+                setRecordsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-gray-300 rounded-md px-2 py-1 bg-white outline-none"
             >
-              {pageRanges[currentPage - 1]?.label} ▼
-            </button>
-
-            {isPageDropdownOpen && (
-              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-28 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
-
-                {pageRanges.map((range) => (
-                  <button
-                    key={range.page}
-                    onClick={() => {
-                      setCurrentPage(range.page);
-                      setIsPageDropdownOpen(false);
-                    }}
-                    className={`block w-full px-3 py-2 text-sm text-left hover:bg-gray-100 ${currentPage === range.page
-                        ? "bg-gray-100 font-semibold"
-                        : ""
-                      }`}
-                  >
-                    {range.label}
-                  </button>
-                ))}
-
-              </div>
-            )}
-
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
           </div>
 
-          {/* Next */}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === totalPages
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-indigo-500 text-white hover:bg-indigo-600"
-              }`}
-          >
-            Next
-          </button>
+          {/* Total Count */}
+          <div className="text-sm text-gray-600">
+            {filteredData.length === 0
+              ? "0"
+              : `${(currentPage - 1) * recordsPerPage + 1}-${Math.min(
+                currentPage * recordsPerPage,
+                filteredData.length
+              )}`}{" "}
+            of {filteredData.length}
+          </div>
 
+          {/* Page Navigation */}
+          <div className="flex items-center gap-1">
+
+            {/* Previous */}
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-3 py-1.5 rounded-md border text-sm font-medium ${currentPage === 1
+                ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+            >
+              Prev
+            </button>
+
+            {/* CURRENT PAGE / TOTAL PAGES */}
+            <span className="px-3 py-1.5 text-sm font-medium text-gray-700">
+              {currentPage}/{totalPages}
+            </span>
+
+            {/* Next */}
+            {/* Next */}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1.5 rounded-md border text-sm font-medium ${currentPage === totalPages
+                ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+            >
+              Next
+            </button>
+
+          </div>
         </div>
       )}
 

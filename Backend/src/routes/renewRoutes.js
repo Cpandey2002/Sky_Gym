@@ -17,7 +17,7 @@ router.post("/", createRenew);
 
 router.get("/", getAllRenew);
 
-router.get("/client", getRenewByClientId);
+router.get("/client/:clientId", getRenewByClientId);
 
 router.put("/", updateRenew);
 
