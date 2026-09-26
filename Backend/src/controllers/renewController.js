@@ -1,4 +1,4 @@
-import RenewModel from "../models/RenewModel.js";
+import RenewModel from "../models/renewModel.js";
 
 export const createRenew = async (req, res) => {
   try {
