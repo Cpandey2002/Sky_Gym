@@ -376,7 +376,7 @@ export default function Registration() {
                 <Topbar />
 
                 {/* Page Content */}
-                <div className="bg-white p-4 rounded-lg shadow-md">
+               <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm m-4">
                     {/* <h2 className="text-2xl font-semibold mb-4">Client Registration</h2> */}
                     <form
                         onSubmit={(e) => {

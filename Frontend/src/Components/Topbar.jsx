@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAllClients } from "../API/Client";
+import CompanyLogo from "../Features/CompanyLogo";
 
 const Topbar = ({ rightContent }) => {
     const navigate = useNavigate();
@@ -455,24 +456,21 @@ const Topbar = ({ rightContent }) => {
 
                 <div className="relative profile-menu">
 
-                    <img
-                        src="/default-avatar.png"
-                        alt="profile"
-                        onClick={() => {
-                            setShowProfileMenu(
-                                !showProfileMenu
-                            );
+                    <div
+    onClick={() => { 
+        setShowProfileMenu(!showProfileMenu); 
+        setShowNotifications(false); 
+        setSelectedClient(null); 
+    }}
+    className="cursor-pointer"
+>
+    <CompanyLogo
+        companyCode={company_code}
+        className="w-12 h-8 rounded-full border-2 border-[#C2FC85] object-cover"
+    />
+</div>
 
-                            setShowNotifications(false);
-
-                            setSelectedClient(null);
-                        }}
-                        className="
-                            w-10 h-10 rounded-full
-                            border-2 border-[#C2FC85]
-                            cursor-pointer
-                        "
-                    />
+                    {/* <CompanyLogo companyCode={profile.company_code} /> */}
 
                     {/* PROFILE DROPDOWN */}
 
@@ -488,7 +486,7 @@ const Topbar = ({ rightContent }) => {
 
                             {/* COMPANY HEADER */}
 
-                            <div className="p-4 bg-gray-100 flex items-center gap-3">
+                            {/* <div className="p-4 bg-gray-100 flex items-center gap-3">
 
                                 <img
                                     src="/default-avatar.png"
@@ -508,7 +506,7 @@ const Topbar = ({ rightContent }) => {
                                     )}
                                 </div>
 
-                            </div>
+                            </div> */}
 
                             {/* PROFILE */}
 

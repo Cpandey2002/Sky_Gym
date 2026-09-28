@@ -121,7 +121,7 @@ export default function Profile() {
 
 
           {/* Form */}
-          <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-2 gap-3">
 
             {/* Company Name (readonly) */}
             <div>
@@ -182,8 +182,8 @@ export default function Profile() {
 
 
             {/* Address (editable) */}
-            <div>
-              <label className="text-sm text-gray-600">
+            <div className="col-span-2">
+              <label className="text-sm text-gray-600 w-full">
                 Address
               </label>
 
@@ -195,13 +195,14 @@ export default function Profile() {
               />
             </div>
 
+              </div>
 
             {/* Save Button */}
-            <div className="pt-4">
+            <div className="pt-4 w-full flex justify-end">
 
               <button
                 onClick={handleSave}
-                className="w-full bg-black text-white py-3 rounded-xl hover:bg-[#163332] transition"
+                className="w-auto p-4 bg-black text-white py-2 rounded-xl hover:bg-[#163332] transition"
               >
                 Save Profile
               </button>
@@ -209,7 +210,6 @@ export default function Profile() {
             </div>
 
 
-          </div>
 
         </div>
 
