@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:4004";
+export const BASE_URL =import.meta.env.VITE_API_URL || "http://localhost:4004";
 // change
 // export const BASE_URL = "https://propose-proceedings-lawyer-publishers.trycloudflare.com";
 

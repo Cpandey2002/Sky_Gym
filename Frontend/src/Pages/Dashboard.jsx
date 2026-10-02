@@ -205,40 +205,48 @@ const Dashboard = () => {
           {/* ================= DASHBOARD CARDS ================= */}
 
           <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 w-full">
+
             <DashboardCard
               title="Total Clients"
               value={totalClients}
+              percentage={100}
             />
 
             <DashboardCard
               title="Active Members"
               value={activeMembers}
+              percentage={totalClients ? (activeMembers / totalClients) * 100 : 0}
             />
 
             <DashboardCard
               title="Expired Members"
               value={expiredMembers}
+              percentage={totalClients ? (expiredMembers / totalClients) * 100 : 0}
             />
 
             <DashboardCard
               title="Expiring Soon"
               value={expiringSoon}
+              percentage={totalClients ? (expiringSoon / totalClients) * 100 : 0}
             />
 
             <DashboardCard
               title="Today's Birthdays"
               value={todayBirthdays}
+              percentage={totalClients ? (todayBirthdays / totalClients) * 100 : 0}
             />
 
             <DashboardCard
               title="Total Enquiries"
               value={totalEnquiries}
+              percentage={totalClients ? (totalEnquiries / totalClients) * 100 : 0}
             />
+
           </div>
 
           {/* ================= ENQUIRIES + MEMBERS OVERVIEW ================= */}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[66%_34%] gap-4 mt-6">
 
             {/* Today's Enquiries */}
 
@@ -257,12 +265,12 @@ const Dashboard = () => {
 
             {/* Members Overview */}
 
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold mb-4">
+            <div className="bg-white p-3 rounded-lg shadow-md">
+              <h2 className="text-xl font-semibold -mb-2">
                 Members Overview
               </h2>
 
-              <div className="w-full h-[250px]">
+              <div className="w-full h-[240px]">
                 <ResponsiveContainer
                   width="100%"
                   height="100%"
@@ -273,9 +281,9 @@ const Dashboard = () => {
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
-                      cy="35%"
-                      outerRadius={80}
-                      innerRadius={45}
+                      cy="55%"
+                      outerRadius={60}
+                      innerRadius={35}
                       paddingAngle={2}
                       label
                     >
@@ -293,25 +301,25 @@ const Dashboard = () => {
 
                     <Tooltip />
 
-                    <Legend height={20} />
+                    <Legend height={30} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          {/* ================= BIRTHDAYS + EXPIRING ================= */}
+          {/* ================= BIRTHDAYS + EXPIRING +  Blanck Box================= */}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6 ">
 
             {/* Birthdays - Next 7 Days */}
 
-            <div className="bg-white rounded-lg shadow-md p-5">
+            <div className="bg-white rounded-lg shadow-md p-5  h-[280px]">
               <h2 className="text-xl font-semibold mb-4">
                 Birthdays - Next 7 Days
               </h2>
 
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[190px] overflow-y-auto">
                 {weeklyBirthdays.length === 0 ? (
                   <p className="text-gray-500 text-sm">
                     No birthdays in the next 7 days.
@@ -351,12 +359,12 @@ const Dashboard = () => {
 
             {/* Expiring Members - Next 7 Days */}
 
-            <div className="bg-white rounded-lg shadow-md p-5">
+            <div className="bg-white rounded-lg shadow-md p-5 h-[280px]">
               <h2 className="text-xl font-semibold mb-4">
                 Expiring Members - Next 7 Days
               </h2>
 
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              <div className="space-y-3 max-h-[190px] overflow-y-auto">
                 {expiringMembersList.length === 0 ? (
                   <p className="text-gray-500 text-sm">
                     No members expiring in the next 7 days.
@@ -380,7 +388,7 @@ const Dashboard = () => {
                         key={client.id || index}
                         className="flex items-center justify-between border-b border-gray-200 pb-2"
                       >
-                        <span className="font-sm text-black">
+                        <span className="text-sm text-black">
                           {client.client_name}
                         </span>
 
@@ -392,6 +400,9 @@ const Dashboard = () => {
                   })
                 )}
               </div>
+            </div>
+            {/* Blank Box */}
+            <div className="bg-white rounded-lg shadow-md p-5 h-[280px]"> No data in the box
             </div>
           </div>
         </main>
